@@ -132,8 +132,8 @@ $(document).ready(function(e){
 function ngl_viewer(AXPATH, BBPATH, CRPATH, PDBPATH, PPATH, IPATH, SPATH) {
     repdata = {};
     stage = new NGL.Stage("viewport",
-        {"cameraType": "orthographic",
-            "backgroundColor": "white"});
+        {"cameraType": "perspective",
+            "backgroundColor": "black"});
 
     stage.signals.hovered.add(function(d){
         var msg = getPickingMessage( d, "" );
