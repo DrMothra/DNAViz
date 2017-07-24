@@ -67,44 +67,44 @@ RepresentationGroup.prototype.addRepresentation = function(display_name, repr, s
     repr.setVisibility(false);
     this.reprList.push(repr);
     return this;
-}
+};
 
 RepresentationGroup.prototype.toggle = function(checked) {
     // Toggle the visibility state of this group
     this.visible = checked;
     this.update();
-}
+};
 
 RepresentationGroup.prototype.setVisibility = function(what) {
     // Show/Hide all representations in group
     this.reprList.forEach(function(repr) {
         repr.setVisibility(what);
     });
-}
+};
 RepresentationGroup.prototype.setParameters = function(what) {
     // Show/Hide all representations in group
     this.reprList.forEach(function(repr) {
         repr.setParameters(what);
     });
-}
+};
 RepresentationGroup.prototype.setSelection = function(what) {
     // Show/Hide all representations in group
     this.reprList.forEach(function(repr) {
         repr.setSelection(what);
     });
-}
+};
 
 RepresentationGroup.prototype.update = function() {
     // Update representation visilibity
     this.setVisibility(this.visible);
-}
+};
 
 RepresentationGroup.prototype.all_empty = function() {
     // Check if all representations in group are empty
     return this.reprList.every(function(repr) {
         return repr.repr.structureView.atomCount == 0;
     });
-}
+};
 
 RepresentationGroup.prototype.GUI = function(class_name, enabled) {
     /*
@@ -152,7 +152,7 @@ RepresentationGroup.prototype.GUI = function(class_name, enabled) {
     }
     this.update();
     return c;
-}
+};
 
 /*
  *
@@ -191,7 +191,7 @@ MutuallyExclusiveRepresentationGroup.prototype.enable = function(ci) {
     if(ci < this.reprList.length)
         this.enabled = ci;
     this.update();
-}
+};
 
 MutuallyExclusiveRepresentationGroup.prototype.nenable = function(name) {
     /*
@@ -202,12 +202,12 @@ MutuallyExclusiveRepresentationGroup.prototype.nenable = function(name) {
     });
     this.enable(i);
     return i;
-}
+};
 
 MutuallyExclusiveRepresentationGroup.prototype.update = function() {
     // Update representation visilibity
     this.setVisibility(false);
     if(this.visible && this.enabled >= 0)
         this.reprList[this.enabled].setVisibility(true)
-}
+};
 

@@ -144,7 +144,8 @@ function ngl_viewer(AXPATH, BBPATH, CRPATH, PDBPATH, PPATH, IPATH, SPATH) {
     var pdbRG = stage.loadFile(PDBPATH)
         .then(function(c) {
             var some = do_input(c);
-            $.extend(some, do_interactions(c, PPATH, IPATH, SPATH)); /* NEW */
+            //DEBUG
+            //$.extend(some, do_interactions(c, PPATH, IPATH, SPATH));//NEW
             return some;
         }, error);
     var axRG, bbRG, crRG;
@@ -184,7 +185,9 @@ function ngl_viewer(AXPATH, BBPATH, CRPATH, PDBPATH, PPATH, IPATH, SPATH) {
         function(RGdata) {
             var lc = $("#"+"lcontrols");
             if(RGdata["Nucleic Acid"])
-                lc.append(RGdata["Nucleic Acid"].GUI("nadisplay", true));
+                //DEBUG
+                //lc.append(RGdata["Nucleic Acid"].GUI("nadisplay", true));
+                RGdata["Nucleic Acid"].GUI("nadisplay", true);
             if(RGdata["Axis"])
                 lc.append(RGdata["Axis"].GUI("axdisplay", true));
             if(RGdata["Backbone"])
@@ -329,7 +332,7 @@ function do_input(comp) {
         "Nucleic Acid":
             new MutuallyExclusiveRepresentationGroup(comp, "Nucleic Acid", "nucleic")
                 .addRepresentation( "Wire",
-                    comp.addRepresentation( "licorice",   {"colorScheme": NDBColors}))
+                    comp.addRepresentation( "base",   {"colorScheme": NDBColors}))
                 .addRepresentation( "Element",
                     comp.addRepresentation( "ball+stick", {"colorScheme": "element"}))
                 .addRepresentation( "Surface",
