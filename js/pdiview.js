@@ -51,7 +51,7 @@ var lowsaturation = //RGBYC
 var higsaturation = //RGBYC
     [0xFF7070, 0xA0FFA0, 0xA0A0FF, 0xFFFF70, 0x70FFFF];
 var logos = //RGBYC
-    [0x00720D, 0xFFCB00, 0x2AB400, 0xFF9200, 0x70FFFF]
+    [0x00720D, 0xFFCB00, 0x2AB400, 0xFF9200, 0x70FFFF];
 var rgbyc = logos;
 var NDBColors = NGL.ColormakerRegistry.addSelectionScheme( [ // A red, T blue, C yellow, G green, and U cyan.
     [rgbyc[0],"DA or A"],
@@ -153,7 +153,9 @@ class DNAViz {
             let appearanceConfig = {
                 Back: '#000000',
                 BBone: '#ff0000',
-                Pairs: '#0000ff'
+                G: '#00ff00',
+                Pairs: ["Wire", "Element", "Surface", "Cylinder", "Smooth", "Spacefill", "Label"],
+                Protein: ["Cartoon", "Wire", "Surface", "Ribbon", "Rope", "Tube"]
             };
             let visibilityConfig = {
                 NAcid: true,
@@ -176,9 +178,21 @@ class DNAViz {
                         this.onBackboneColourChanged(appearanceConfig.BBone);
                     }
                 })
-                .addColor(appearanceConfig, "Pairs", {
+                .addColor(appearanceConfig, "G", {
                     colorMode: "hex", onChange: () => {
-                        this.onChangeRepresentation(1);
+                        this.onGMoleculeColourChanged(appearanceConfig.G);
+                    }
+                })
+                .addSelect(appearanceConfig, "Pairs", {
+                    selected: 0,
+                    onChange: index => {
+                        this.onChangeBasePairRepresentation(index);
+                    }
+                })
+                .addSelect(appearanceConfig, "Protein", {
+                    selected: 0,
+                    onChange: index => {
+                        this.onChangeProteinRepresentation(index);
                     }
                 })
                 .addGroup({label: "Visibility", enable: false})
@@ -216,8 +230,24 @@ class DNAViz {
             "radius":      0.3});
     }
 
-    onChangeRepresentation(representation) {
+    onGMoleculeColourChanged(colour) {
+        rgbyc[0] = 0x000000;
+        NDBColors = NGL.ColormakerRegistry.addSelectionScheme( [ // A red, T blue, C yellow, G green, and U cyan.
+            [rgbyc[0],"DA or A"],
+            [rgbyc[1],"DG or G"],
+            [rgbyc[2],"DT"],
+            [rgbyc[3],"DC or C"],
+            [rgbyc[4],"U"],
+            ["gray","*"]
+        ]);
+    }
+
+    onChangeBasePairRepresentation(representation) {
         this.repData["Nucleic Acid"].enable(representation);
+    }
+
+    onChangeProteinRepresentation(representation) {
+        this.repData["Protein"].enable(representation);
     }
 
     toggleAcid() {
@@ -288,13 +318,21 @@ function do_input(comp) {
         "Nucleic Acid":
             new MutuallyExclusiveRepresentationGroup(comp, "Nucleic Acid", "nucleic")
                 .addRepresentation( "Wire",
-                    comp.addRepresentation( "base",   {"colorScheme": NDBColors}))
+                    comp.addRepresentation( "licorice",   {"colorScheme": NDBColors}))
                 .addRepresentation( "Element",
                     comp.addRepresentation( "ball+stick", {"colorScheme": "element"}))
                 .addRepresentation( "Surface",
                     comp.addRepresentation( "surface",    {"opacity": Nso,
                         "colorScheme": "uniform",
-                        "colorValue":  Ncs})),
+                        "colorValue":  Ncs}))
+                .addRepresentation( "Cylinder",
+                    comp.addRepresentation( "base",   {"colorScheme": NDBColors}))
+                .addRepresentation( "Smooth",
+                    comp.addRepresentation( "hyperball",   {"colorScheme": NDBColors}))
+                .addRepresentation( "Spacefill",
+                    comp.addRepresentation( "spacefill",   {"colorScheme": NDBColors}))
+                .addRepresentation( "Label",
+                    comp.addRepresentation( "label",   {"colorScheme": NDBColors})),
         // Protein
         "Protein":
             new MutuallyExclusiveRepresentationGroup(comp, "Protein", "protein")
@@ -308,6 +346,15 @@ function do_input(comp) {
                     comp.addRepresentation( "surface",  {"opacity": Pso,
                         "colorScheme": "uniform",
                         "colorValue":  Pcs}))
+                .addRepresentation( "Ribbon",
+                    comp.addRepresentation( "ribbon", {"colorScheme": "uniform",
+                        "colorValue": Pcc}))
+                .addRepresentation( "Rope",
+                    comp.addRepresentation( "rope", {"colorScheme": "uniform",
+                        "colorValue": Pcc}))
+                .addRepresentation( "Tube",
+                    comp.addRepresentation( "tube", {"colorScheme": "uniform",
+                        "colorValue": Pcc}))
     };
 }
 
