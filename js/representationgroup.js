@@ -69,9 +69,9 @@ RepresentationGroup.prototype.addRepresentation = function(display_name, repr, s
     return this;
 };
 
-RepresentationGroup.prototype.toggle = function(checked) {
+RepresentationGroup.prototype.toggle = function() {
     // Toggle the visibility state of this group
-    this.visible = checked;
+    this.visible = !this.visible;
     this.update();
 };
 

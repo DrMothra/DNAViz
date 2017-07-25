@@ -65,128 +65,153 @@ var NDBColors = NGL.ColormakerRegistry.addSelectionScheme( [ // A red, T blue, C
 var DEBUG = false;
 
 /* GLOBALS */
-var stage, repdata, dna_axis, orientation, zoom;
+var dna_axis, orientation, zoom;
 var reference_orientation_component = null;
 
+class DNAViz {
+    constructor() {
+
+    }
+
+    createScene(AXIS_PATH, BACKBONE_PATH, CRPATH, PROTEIN_PATH, PPATH, IPATH, SPATH) {
+        this.stage = new NGL.Stage("viewport",
+            {"cameraType": "perspective",
+                "backgroundColor": "black"});
+
+        this.stage.signals.hovered.add(function(d){
+            var msg = getPickingMessage( d, "" );
+            $("#tooltip").html(msg);
+        });
+
+        // Create RepresentationGroups for the input PDB
+        var pdbRG = this.stage.loadFile(PROTEIN_PATH)
+            .then(function(c) {
+                var some = do_input(c);
+                //DEBUG
+                //$.extend(some, do_interactions(c, PPATH, IPATH, SPATH));//NEW
+                return some;
+            }, error);
+        var axRG, bbRG, crRG;
+        // Define dummy axis if we lack one
+        if(AXIS_PATH != "") {
+            // Create RepresentationGroups for the axis PDB
+            axRG = this.stage.loadFile(AXIS_PATH)
+                .then(function(c) {
+                    // Get Axis approximate axis
+                    reference_orientation_component = c;
+                    return c;})
+                .then(do_ax, error);
+        } else {
+            pdbRG.then(function(rg) {
+                reference_orientation_component = rg["Nucleic Acid"].component;
+                return rg;});
+        }
+        if(BACKBONE_PATH != "") {
+            // Create RepresentationGroups for the backbone PDB
+            bbRG = this.stage.loadFile(BACKBONE_PATH).then(do_bb, error);
+        }
+
+        // Wall: resolve all RepresentationGroups
+        Promise.all([pdbRG, axRG, bbRG, crRG]).then( RG => {
+            // Set initial orientation and zoom
+            this.repData = {};
+            reference_orientation_component.autoView();
+            // Aggregate RepresentationGroups in repdata
+            RG.forEach(rep => {
+                $.extend(this.repData, rep);
+            });
+        }).then( () => {
+            // Write GUI for RepresentationGroups
+            // in specific containers, in a specific order.
+            let RGdata = this.repData;
+            if(RGdata["Nucleic Acid"])
+                RGdata["Nucleic Acid"].GUI("nadisplay", true);
+            if(RGdata["Axis"])
+                RGdata["Axis"].GUI("axdisplay", true);
+            if(RGdata["Backbone"])
+                RGdata["Backbone"].GUI("bbdisplay", true);
+            if(RGdata["MinorGroove"])
+                RGdata["MinorGroove"].GUI("gr1display", false);
+            if(RGdata["MajorGroove"])
+                RGdata["MajorGroove"].GUI("gr2display", false);
+            if(RGdata["Curvature"])
+                RGdata["Curvature"].GUI("crdisplay", true);
+            if(RGdata["Protein"])
+                RGdata["Protein"].GUI("prodisplay", true);
+        });
+
+        window.addEventListener(
+            "resize", event => {
+                this.stage.handleResize();
+            }, false
+        );
+    }
+
+    createGUI() {
+        //Create GUI - controlKit
+        window.addEventListener('load', () => {
+            let appearanceConfig = {
+                Back: '#000000',
+                NAcid: true,
+                BBone: true,
+                Axis: true
+            };
+
+            let controlKit = new ControlKit();
+
+            controlKit.addPanel({width: 200})
+                .addGroup({label: "Appearance", enable: false})
+                .addColor(appearanceConfig, "Back", {
+                    colorMode: "hex", onChange: () => {
+                        this.onBackgroundColourChanged(appearanceConfig.Back);
+                    }
+                })
+                .addCheckbox(appearanceConfig, "NAcid", {
+                    onChange: () => {
+                        this.toggleAcid();
+                    }
+                })
+                .addCheckbox(appearanceConfig, "BBone", {
+                    onChange: () => {
+                        this.toggleBackbone();
+                    }
+                })
+                .addCheckbox(appearanceConfig, "Axis", {
+                    onChange: () => {
+                        this.toggleAxis();
+                    }
+                })
+        });
+    }
+
+    onBackgroundColourChanged(colour) {
+        this.stage.setParameters( {backgroundColor: colour} );
+    }
+
+    toggleAcid() {
+        this.repData["Nucleic Acid"].toggle();
+    }
+
+    toggleBackbone() {
+        this.repData["Backbone"].toggle();
+    }
+
+    toggleAxis() {
+        this.repData["Axis"].toggle();
+    }
+}
+
 $(document).ready(function(e){
-    create_GUI();
-    ngl_viewer("data/output_X.pdb",
+    let app = new DNAViz();
+    app.createScene("data/output_X.pdb",
         "data/output_B.pdb",
         "data/output_R.pdb",
         "data/output.pdb",
         "data/pairings.dat",
         "data/interactions.dat",
         "data/sequence.dat");
+    app.createGUI();
 });
-
-function create_GUI() {
-    //Create GUI - controlKit
-    window.addEventListener('load', () => {
-        let appearanceConfig = {
-            Back: '#000000'
-        };
-
-        let controlKit = new ControlKit();
-
-        controlKit.addPanel({width: 200})
-            .addGroup({label: "Appearance", enable: false})
-            .addColor(appearanceConfig, "Back", {
-                colorMode: "hex", onChange: () => {
-                    onBackgroundColourChanged(appearanceConfig.Back);
-                }
-            })
-    });
-}
-
-function onBackgroundColourChanged(colour) {
-    stage.setParameters( {backgroundColor: colour} );
-}
-/*************************
- * Create the viewer
- */
-function ngl_viewer(AXPATH, BBPATH, CRPATH, PDBPATH, PPATH, IPATH, SPATH) {
-    repdata = {};
-    stage = new NGL.Stage("viewport",
-        {"cameraType": "perspective",
-            "backgroundColor": "black"});
-
-    stage.signals.hovered.add(function(d){
-        var msg = getPickingMessage( d, "" );
-        $("#tooltip").html(msg);
-    });
-
-    // Create RepresentationGroups for the input PDB
-    var pdbRG = stage.loadFile(PDBPATH)
-        .then(function(c) {
-            var some = do_input(c);
-            //DEBUG
-            //$.extend(some, do_interactions(c, PPATH, IPATH, SPATH));//NEW
-            return some;
-        }, error);
-    var axRG, bbRG, crRG;
-    // Define dummy axis if we lack one
-    if(AXPATH != "") {
-        // Create RepresentationGroups for the axis PDB
-        axRG = stage.loadFile(AXPATH)
-            .then(function(c) {
-                // Get Axis approximate axis
-                reference_orientation_component = c;
-                return c;})
-            .then(do_ax, error);
-    } else {
-        pdbRG.then(function(rg) {
-            reference_orientation_component = rg["Nucleic Acid"].component;
-            return rg;});
-    }
-    if(BBPATH != "") {
-        // Create RepresentationGroups for the backbone PDB
-        bbRG = stage.loadFile(BBPATH).then(do_bb, error);
-    }
-    // if(CRPATH != "") {
-    //     // Create RepresentationGroups for the curvature PDB
-    //     crRG = stage.loadFile(CRPATH).then(do_cr, error);
-    // }
-
-    // Wall: resolve all RepresentationGroups
-    Promise.all([pdbRG, axRG, bbRG, crRG]).then(function(RG) {
-        // Set initial orientation and zoom
-        reference_orientation_component.autoView();
-        // Aggregate RepresentationGroups in repdata
-        RG.forEach(function(rep) {$.extend(repdata, rep);});
-        return repdata;
-    }).then(
-        // Write GUI for RepresentationGroups
-        // in specific containers, in a specific order.
-        function(RGdata) {
-            var lc = $("#"+"lcontrols");
-            if(RGdata["Nucleic Acid"])
-                //DEBUG
-                //lc.append(RGdata["Nucleic Acid"].GUI("nadisplay", true));
-                RGdata["Nucleic Acid"].GUI("nadisplay", true);
-            if(RGdata["Axis"])
-                lc.append(RGdata["Axis"].GUI("axdisplay", true));
-            if(RGdata["Backbone"])
-                lc.append(RGdata["Backbone"].GUI("bbdisplay", true));
-            if(RGdata["MinorGroove"])
-                lc.append(RGdata["MinorGroove"].GUI("gr1display", false));
-            if(RGdata["MajorGroove"])
-                lc.append(RGdata["MajorGroove"].GUI("gr2display", false));
-            if(RGdata["Curvature"])
-                lc.append(RGdata["Curvature"].GUI("crdisplay", true));
-
-            var rc = $("#"+"rcontrols");
-            if(RGdata["Protein"])
-                rc.append(RGdata["Protein"].GUI("prodisplay", true));
-        });
-
-    window.addEventListener(
-        "resize", function( event ){
-            stage.handleResize();
-        }, false
-    );
-
-
-}
 
 function safariw(data, target) {
     var url = URL.createObjectURL( data );
