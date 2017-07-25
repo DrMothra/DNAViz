@@ -68,55 +68,8 @@ var DEBUG = false;
 var stage, repdata, dna_axis, orientation, zoom;
 var reference_orientation_component = null;
 
-
 $(document).ready(function(e){
-    $("#plots_selector").change(function(){
-        /* Activate carousel on change */
-        var selected = $(this).children(":selected" )[0];
-        var slide_to = parseInt($(selected).attr("data-slide-to"));
-        var carousel_id = $(this).attr("data-target");
-        $(carousel_id).carousel(slide_to);
-        console.log("selector", slide_to)
-    });
-    $("#plots").on('slide.bs.carousel', function (e) {
-        /* Update select on carousel change */
-        var destination = $(e.relatedTarget).index();
-        var select = $("#plots_selector");
-        var option = select.children("[data-slide-to="+destination+"]")[0];
-        console.log(destination, option)
-        select.val(option.value);
-    });
-    $("#controls-toggler").slideUp();
-    $("#controls-toggler-control").click(function(e){
-        var toggler = $("#controls-toggler");
-        var toggle_icon = $("#controls-openclose");
-        toggler.slideToggle(500);
-        toggle_icon.toggleClass("glyphicon-arrow-right glyphicon-arrow-left")
-    });
-    $("#plots")
-        .append(
-            $("<a/>",
-                {"data-toggle": "tooltip",
-                    "title": "<img src='http://vre.multiscalegenomics.eu/test/marco/img/plot_legend.png' />"})
-                .css("html","true")
-                .append("Plot Legend"))
-        .append($("<br/>"))
-        .append(
-            $("<a/>",
-                {"data-toggle": "tooltip",
-                    "title": "<img src='http://vre.multiscalegenomics.eu/test/marco/img/dna_helical_parameters.png' />"})
-                .css("html","true")
-                .append("Help with DNA helical parameters"));
-    /*
-    $('a[data-toggle="tooltip"]').tooltip({
-        animated: 'fade',
-        placement: 'top',
-        html: true,
-        container: 'body',
-        selector: ''
-    });
-    */
-
+    create_GUI();
     ngl_viewer("data/output_X.pdb",
         "data/output_B.pdb",
         "data/output_R.pdb",
@@ -126,6 +79,28 @@ $(document).ready(function(e){
         "data/sequence.dat");
 });
 
+function create_GUI() {
+    //Create GUI - controlKit
+    window.addEventListener('load', () => {
+        let appearanceConfig = {
+            Back: '#000000'
+        };
+
+        let controlKit = new ControlKit();
+
+        controlKit.addPanel({width: 200})
+            .addGroup({label: "Appearance", enable: false})
+            .addColor(appearanceConfig, "Back", {
+                colorMode: "hex", onChange: () => {
+                    onBackgroundColourChanged(appearanceConfig.Back);
+                }
+            })
+    });
+}
+
+function onBackgroundColourChanged(colour) {
+    stage.setParameters( {backgroundColor: colour} );
+}
 /*************************
  * Create the viewer
  */
@@ -202,8 +177,6 @@ function ngl_viewer(AXPATH, BBPATH, CRPATH, PDBPATH, PPATH, IPATH, SPATH) {
             var rc = $("#"+"rcontrols");
             if(RGdata["Protein"])
                 rc.append(RGdata["Protein"].GUI("prodisplay", true));
-            rc.append(GUI_extras(RGdata["Axis"]));
-            more_GUI_extras();
         });
 
     window.addEventListener(
@@ -211,98 +184,13 @@ function ngl_viewer(AXPATH, BBPATH, CRPATH, PDBPATH, PPATH, IPATH, SPATH) {
             stage.handleResize();
         }, false
     );
-}
 
-function align() {
-    var pa = reference_orientation_component.structure.getPrincipalAxes(),
-        q=pa.getRotationQuaternion(),
-        a=new NGL.Quaternion(0, 1, 0, 0),
-        b=new NGL.Quaternion(0, 0, 1, 0),
-        c=new NGL.Quaternion(0, 0, 0, 1);
-    q.multiplyQuaternions(a,q);
-    q.multiplyQuaternions(b,q);
-    q.multiplyQuaternions(a,q);
-    stage.animationControls.rotate(q);
-}
 
-// requires previously defined initial orientation and zoom
-function orient() {
-    // reset orientation to initial
-    reference_orientation_component.autoView(1000);
-}
-
-/*************************
- * Define extra GUI elements.
- */
-function GUI_extras(axis) {
-    // Background
-    var cdiv = $("<div/>", {"class": "colors"});
-    cdiv.append("BG: ");
-    BGCOLORS.forEach(function(c) {
-        cdiv.append(
-            $("<a/>", {"class": "dummylink"}).append(
-                $("<div/>", {"id": "",
-                    "class": "cimg"})
-                    .css("background-color", c)
-                    .click(function(e) {stage.viewer.setBackground(c);})));
-    });
-
-    if(!axis) return cdiv;
-
-    // Buttons
-    var ddiv = $("<div/>", {"class": "buttons"});
-    ddiv.append(
-        $("<input/>", {"type": "button",
-            "value": "Reset orientation"})
-            .click(orient),
-        $("<input/>", {"type": "button",
-            "value": "Align Axis"})
-            .click(align),
-        $("<br/>")
-    );
-    align();
-    return [cdiv, ddiv];
 }
 
 function safariw(data, target) {
     var url = URL.createObjectURL( data );
     target.location.href = url;
-}
-
-function more_GUI_extras() {
-    // Safari Hack: open image in new window
-    if( typeof window === "undefined" ) return false;
-    var ua = window.navigator.userAgent,
-        isSafari = ( /Safari/i.test( ua ) && ! /Chrome/i.test( ua ) ),
-        safariwin = null;
-    // More Buttons
-    function image() {
-        if(isSafari) { // Safari Hack: open window early, otherwise Safari will block it!
-            safariwin = window.open();
-            safariwin.document.write("<html><head></head><body><h1>3DConsensus</h1><h3>Thank you for your patience...</h3>Please wait while screenshot is being created. This may take a few seconds...</body></html>")
-        }
-        var fname = "screenshot.png"
-        stage.makeImage({
-            factor: 4,
-            antialias: true,
-            trim: false,
-            transparent: false
-        }).then( function( blob ){
-            if(isSafari) { // Safari Hack: set new window URL to image
-                return safariw(blob, safariwin);
-            }
-            return NGL.download( blob, fname );
-        });
-    }
-
-    var ediv = $("<div/>", {"style": "position:absolute; bottom: 5px; right: 5px;"});
-    ediv.append(
-        $("<img/>", {"src": "/tools/pdiview/assets/output/img/camera.svg",
-            "width": "25px"})
-            .click(image));
-    $(stage.viewer.container)
-        .css("position", "relative")
-        .append(ediv);
 }
 
 getPickingMessage = function( d, prefix ){
@@ -327,6 +215,13 @@ getPickingMessage = function( d, prefix ){
  *
  */
 function do_input(comp) {
+    //Add some custom shapes
+    /*
+    let shape = new NGL.Shape( "shape" );
+    shape.addCone([0, 2, 7], [0, 3, 3], [1, 1, 0], 1.5);
+    let shapeComp = stage.addComponentFromObject(shape);
+    shapeComp.addRepresentation("cone");
+    */
     return {
         // Nucleic
         "Nucleic Acid":
