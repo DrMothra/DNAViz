@@ -152,9 +152,14 @@ class DNAViz {
         window.addEventListener('load', () => {
             let appearanceConfig = {
                 Back: '#000000',
+                BBone: '#ff0000',
+                Pairs: '#0000ff'
+            };
+            let visibilityConfig = {
                 NAcid: true,
                 BBone: true,
-                Axis: true
+                Axis: true,
+                Protein: true
             };
 
             let controlKit = new ControlKit();
@@ -166,19 +171,35 @@ class DNAViz {
                         this.onBackgroundColourChanged(appearanceConfig.Back);
                     }
                 })
-                .addCheckbox(appearanceConfig, "NAcid", {
+                .addColor(appearanceConfig, "BBone", {
+                    colorMode: "hex", onChange: () => {
+                        this.onBackboneColourChanged(appearanceConfig.BBone);
+                    }
+                })
+                .addColor(appearanceConfig, "Pairs", {
+                    colorMode: "hex", onChange: () => {
+                        this.onChangeRepresentation(1);
+                    }
+                })
+                .addGroup({label: "Visibility", enable: false})
+                .addCheckbox(visibilityConfig, "NAcid", {
                     onChange: () => {
                         this.toggleAcid();
                     }
                 })
-                .addCheckbox(appearanceConfig, "BBone", {
+                .addCheckbox(visibilityConfig, "BBone", {
                     onChange: () => {
                         this.toggleBackbone();
                     }
                 })
-                .addCheckbox(appearanceConfig, "Axis", {
+                .addCheckbox(visibilityConfig, "Axis", {
                     onChange: () => {
                         this.toggleAxis();
+                    }
+                })
+                .addCheckbox(visibilityConfig, "Protein", {
+                    onChange: () => {
+                        this.toggleProtein();
                     }
                 })
         });
@@ -186,6 +207,17 @@ class DNAViz {
 
     onBackgroundColourChanged(colour) {
         this.stage.setParameters( {backgroundColor: colour} );
+    }
+
+    onBackboneColourChanged(colour) {
+        this.repData["Backbone"].setParameters(
+            {"colorScheme": "uniform",
+            "colorValue":  colour,
+            "radius":      0.3});
+    }
+
+    onChangeRepresentation(representation) {
+        this.repData["Nucleic Acid"].enable(representation);
     }
 
     toggleAcid() {
@@ -198,6 +230,10 @@ class DNAViz {
 
     toggleAxis() {
         this.repData["Axis"].toggle();
+    }
+
+    toggleProtein() {
+        this.repData["Protein"].toggle();
     }
 }
 
