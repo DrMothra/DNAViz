@@ -53,6 +53,7 @@ var higsaturation = //RGBYC
 var logos = //RGBYC
     [0x00720D, 0xFFCB00, 0x2AB400, 0xFF9200, 0x70FFFF];
 var rgbyc = logos;
+/*
 var NDBColors = NGL.ColormakerRegistry.addSelectionScheme( [ // A red, T blue, C yellow, G green, and U cyan.
     [rgbyc[0],"DA or A"],
     [rgbyc[1],"DG or G"],
@@ -60,17 +61,41 @@ var NDBColors = NGL.ColormakerRegistry.addSelectionScheme( [ // A red, T blue, C
     [rgbyc[3],"DC or C"],
     [rgbyc[4],"U"],
     ["gray","*"]
-]);
-
+], "DNA_Protein");
+*/
 var DEBUG = false;
 
 /* GLOBALS */
 var dna_axis, orientation, zoom;
 var reference_orientation_component = null;
-
+let NDBColors;
 class DNAViz {
     constructor() {
+        this.moleculeColours = [
+            DNA_COLOURS.MOLECULE_A,
+            DNA_COLOURS.MOLECULE_G,
+            DNA_COLOURS.MOLECULE_T,
+            DNA_COLOURS.MOLECULE_C,
+            DNA_COLOURS.MOLECULE_U
+        ];
+        this.createColourScheme();
+    }
 
+    createColourScheme() {
+        NDBColors = NGL.ColormakerRegistry.addSelectionScheme(
+            [
+                [this.moleculeColours[0], "DA or A"],
+                [this.moleculeColours[1], "DG or G"],
+                [this.moleculeColours[2], "DT"],
+                [this.moleculeColours[3], "DC or C"],
+                [this.moleculeColours[4], "U"],
+                ["gray", "*"]
+            ], "DNA_Protein");
+    }
+
+    changeColourScheme(molecule, colour) {
+        this.moleculeColours[molecule] = colour;
+        this.createColourScheme();
     }
 
     createScene(AXIS_PATH, BACKBONE_PATH, CRPATH, PROTEIN_PATH, PPATH, IPATH, SPATH) {
@@ -152,8 +177,11 @@ class DNAViz {
         window.addEventListener('load', () => {
             let appearanceConfig = {
                 Back: '#000000',
-                BBone: '#ff0000',
-                G: '#00ff00',
+                BBone: '#8b0000',
+                A: DNA_HEX_COLOURS.MOLECULE_A,
+                G: DNA_HEX_COLOURS.MOLECULE_G,
+                T: DNA_HEX_COLOURS.MOLECULE_T,
+                C: DNA_HEX_COLOURS.MOLECULE_C,
                 Pairs: ["Wire", "Element", "Surface", "Cylinder", "Smooth", "Spacefill", "Label"],
                 Protein: ["Cartoon", "Wire", "Surface", "Ribbon", "Rope", "Tube"]
             };
@@ -178,9 +206,24 @@ class DNAViz {
                         this.onBackboneColourChanged(appearanceConfig.BBone);
                     }
                 })
+                .addColor(appearanceConfig, "A", {
+                    colorMode: "hex", onChange: () => {
+                        this.onMoleculeColourChanged(MOLECULES.A, appearanceConfig.A);
+                    }
+                })
                 .addColor(appearanceConfig, "G", {
                     colorMode: "hex", onChange: () => {
-                        this.onGMoleculeColourChanged(appearanceConfig.G);
+                        this.onMoleculeColourChanged(MOLECULES.G, appearanceConfig.G);
+                    }
+                })
+                .addColor(appearanceConfig, "T", {
+                    colorMode: "hex", onChange: () => {
+                        this.onMoleculeColourChanged(MOLECULES.T, appearanceConfig.T);
+                    }
+                })
+                .addColor(appearanceConfig, "C", {
+                    colorMode: "hex", onChange: () => {
+                        this.onMoleculeColourChanged(MOLECULES.C, appearanceConfig.C);
                     }
                 })
                 .addSelect(appearanceConfig, "Pairs", {
@@ -230,16 +273,9 @@ class DNAViz {
             "radius":      0.3});
     }
 
-    onGMoleculeColourChanged(colour) {
-        rgbyc[0] = 0x000000;
-        NDBColors = NGL.ColormakerRegistry.addSelectionScheme( [ // A red, T blue, C yellow, G green, and U cyan.
-            [rgbyc[0],"DA or A"],
-            [rgbyc[1],"DG or G"],
-            [rgbyc[2],"DT"],
-            [rgbyc[3],"DC or C"],
-            [rgbyc[4],"U"],
-            ["gray","*"]
-        ]);
+    onMoleculeColourChanged(molecule, colour) {
+        this.changeColourScheme(molecule, colour);
+        this.repData["Nucleic Acid"].setParameters( {"colorScheme": NDBColors} );
     }
 
     onChangeBasePairRepresentation(representation) {
