@@ -362,7 +362,7 @@ function do_input(comp) {
                         "colorScheme": "uniform",
                         "colorValue":  Ncs}))
                 .addRepresentation( "Cylinder",
-                    comp.addRepresentation( "base",   {"colorScheme": NDBColors}))
+                    comp.addRepresentation( "slab",   {"colorScheme": NDBColors}))
                 .addRepresentation( "Smooth",
                     comp.addRepresentation( "hyperball",   {"colorScheme": NDBColors}))
                 .addRepresentation( "Spacefill",
