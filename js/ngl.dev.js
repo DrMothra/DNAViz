@@ -78568,7 +78568,7 @@ RepresentationRegistry.add('base', BaseRepresentation);
 
             //DEBUG
             /*
-            var cylinderBuffer = new CylinderBuffer(
+            var shapeBuffer = new CylinderBuffer(
                 bondData,
                 this.getBufferParams({
                     openEnded: this.openEnded,
@@ -78579,20 +78579,17 @@ RepresentationRegistry.add('base', BaseRepresentation);
             );
             */
 
-            var boxBuffer = new BoxBuffer(
-                { position: new Float32Array( [-1.0, -1.0, -1.0], [1.0, -1.0, -1.0], [1.0, -1.0, 1.0], [-1.0, -1.0, 1.0],
-                    [-1.0, 1.0, -1.0], [1.0, 1.0, -1.0], [1.0, 1.0, 1.0], [-1.0, 1.0, 1.0]),
-                  color: new Float32Array( [1, 0, 0]),
-                    index: new Float32Array( [0, 1, 2], [0, 2, 3], [1, 5, 6], [1, 6, 2],
-                        [4, 6, 5], [4, 7, 6], [0, 7, 4], [0, 3, 7],
-                        [0, 5, 1], [0, 4, 5], [3, 2, 6], [3, 6, 7])
+            let coOrdinate = 10;
+            var shapeBuffer = new MeshBuffer(
+                { position: new Float32Array( [-coOrdinate, -coOrdinate, -coOrdinate, coOrdinate, -coOrdinate, -coOrdinate, coOrdinate, -coOrdinate, coOrdinate, -coOrdinate, -coOrdinate, coOrdinate,
+                    -coOrdinate, coOrdinate, -coOrdinate, coOrdinate, coOrdinate, -coOrdinate, coOrdinate, coOrdinate, coOrdinate, -coOrdinate, coOrdinate, coOrdinate]),
+                  color: new Float32Array( [1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0])
                 },
-                this.getBufferParams({
-                        disablePicking: true
-                    })
+                this.getBufferParams()
             );
 
-            bufferList.push(boxBuffer);
+
+            bufferList.push(shapeBuffer);
 
             if (!this.cylinderOnly) {
                 var sphereBuffer = new SphereBuffer(
