@@ -78564,6 +78564,7 @@ RepresentationRegistry.add('base', BaseRepresentation);
 
             var bondData = this.getBondData(sview);
             var bufferList = [];
+            let atomData = this.getAtomData(sview);
 
 
             //DEBUG
@@ -78610,9 +78611,11 @@ RepresentationRegistry.add('base', BaseRepresentation);
                                             1, 0, 0,
                                             1, 0, 0,
                                             1, 0, 0])
-                    //index: new Float32Array( [0, 1, 2, 0, 2, 3, 1, 5, 6, 1, 6, 2, 4, 6, 5, 4, 7, 6, 0, 7, 4, 0, 3, 7, 0, 5, 1, 0, 4, 5, 3, 2, 6, 3, 6, 7 ])
                 },
-                this.getBufferParams()
+                this.getBufferParams({
+                    side: "front",
+                    flatShaded: true
+                })
             );
 
 

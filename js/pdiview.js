@@ -182,7 +182,7 @@ class DNAViz {
                 G: DNA_HEX_COLOURS.MOLECULE_G,
                 T: DNA_HEX_COLOURS.MOLECULE_T,
                 C: DNA_HEX_COLOURS.MOLECULE_C,
-                Pairs: ["Wire", "Element", "Surface", "Cylinder", "Smooth", "Spacefill", "Label"],
+                Pairs: ["Wire", "Element", "Surface", "Cylinder", "Smooth", "Spacefill", "Slab"],
                 Protein: ["Cartoon", "Wire", "Surface", "Ribbon", "Rope", "Tube"]
             };
             let visibilityConfig = {
@@ -362,13 +362,13 @@ function do_input(comp) {
                         "colorScheme": "uniform",
                         "colorValue":  Ncs}))
                 .addRepresentation( "Cylinder",
-                    comp.addRepresentation( "slab",   {"colorScheme": NDBColors}))
+                    comp.addRepresentation( "base",   {"colorScheme": NDBColors}))
                 .addRepresentation( "Smooth",
                     comp.addRepresentation( "hyperball",   {"colorScheme": NDBColors}))
                 .addRepresentation( "Spacefill",
                     comp.addRepresentation( "spacefill",   {"colorScheme": NDBColors}))
-                .addRepresentation( "Label",
-                    comp.addRepresentation( "label",   {"colorScheme": NDBColors})),
+                .addRepresentation( "Slab",
+                    comp.addRepresentation( "slab",   {"colorScheme": NDBColors})),
         // Protein
         "Protein":
             new MutuallyExclusiveRepresentationGroup(comp, "Protein", "protein")
