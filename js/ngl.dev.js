@@ -78579,11 +78579,38 @@ RepresentationRegistry.add('base', BaseRepresentation);
             );
             */
 
-            let coOrdinate = 10;
+            let width = 20, height = 20, depth = 20;
+            let halfWidth = width/2, halfHeight = height/2;
             var shapeBuffer = new MeshBuffer(
-                { position: new Float32Array( [-coOrdinate, -coOrdinate, -coOrdinate, coOrdinate, -coOrdinate, -coOrdinate, coOrdinate, -coOrdinate, coOrdinate, -coOrdinate, -coOrdinate, coOrdinate,
-                    -coOrdinate, coOrdinate, -coOrdinate, coOrdinate, coOrdinate, -coOrdinate, coOrdinate, coOrdinate, coOrdinate, -coOrdinate, coOrdinate, coOrdinate]),
-                  color: new Float32Array( [1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0])
+                { position: new Float32Array( [-halfWidth, -halfHeight, 0,
+                                                halfWidth, -halfHeight, 0,
+                                                halfWidth, halfHeight, 0,
+                                                -halfWidth, halfHeight, 0,
+                                                -halfWidth, halfHeight, -depth,
+                                                halfWidth, halfHeight, -depth,
+                                                halfWidth, -halfHeight, -depth,
+                                                -halfWidth, -halfHeight, -depth]),
+                    index: new Uint32Array([0, 1, 3,
+                                            1, 2, 3,
+                                            3, 2, 4,
+                                            2, 5, 4,
+                                            1, 6, 2,
+                                            6, 5, 2,
+                                            6, 7, 5,
+                                            7, 4, 5,
+                                            7, 0, 4,
+                                            0, 3, 4,
+                                            7, 6, 0,
+                                            6, 1, 0]),
+                  color: new Float32Array( [1, 0, 0,
+                                            1, 0, 0,
+                                            1, 0, 0,
+                                            1, 0, 0,
+                                            1, 0, 0,
+                                            1, 0, 0,
+                                            1, 0, 0,
+                                            1, 0, 0])
+                    //index: new Float32Array( [0, 1, 2, 0, 2, 3, 1, 5, 6, 1, 6, 2, 4, 6, 5, 4, 7, 6, 0, 7, 4, 0, 3, 7, 0, 5, 1, 0, 4, 5, 3, 2, 6, 3, 6, 7 ])
                 },
                 this.getBufferParams()
             );
