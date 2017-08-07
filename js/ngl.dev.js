@@ -78567,6 +78567,7 @@ RepresentationRegistry.add('base', BaseRepresentation);
 
 
             //DEBUG
+            /*
             var cylinderBuffer = new CylinderBuffer(
                 bondData,
                 this.getBufferParams({
@@ -78576,25 +78577,22 @@ RepresentationRegistry.add('base', BaseRepresentation);
                     dullInterior: true
                 })
             );
-
-            /*
-            var cylinderBuffer = new CylinderBuffer(
-                { position1: new Float32Array( [0, 0, 0]),
-                  position2: new Float32Array( [10, 0, 0]),
-                  color: new Float32Array( [1, 0, 0]),
-                  color2: new Float32Array( [1, 0, 0]),
-                  radius: new Float32Array( [10])
-                },
-                this.getBufferParams({
-                        openEnded: false,
-                        radialSegments: this.radialSegments,
-                        disableImpostor: this.disableImpostor,
-                        dullInterior: true
-                    })
-            );
             */
 
-            bufferList.push(cylinderBuffer);
+            var boxBuffer = new BoxBuffer(
+                { position: new Float32Array( [-1.0, -1.0, -1.0], [1.0, -1.0, -1.0], [1.0, -1.0, 1.0], [-1.0, -1.0, 1.0],
+                    [-1.0, 1.0, -1.0], [1.0, 1.0, -1.0], [1.0, 1.0, 1.0], [-1.0, 1.0, 1.0]),
+                  color: new Float32Array( [1, 0, 0]),
+                    index: new Float32Array( [0, 1, 2], [0, 2, 3], [1, 5, 6], [1, 6, 2],
+                        [4, 6, 5], [4, 7, 6], [0, 7, 4], [0, 3, 7],
+                        [0, 5, 1], [0, 4, 5], [3, 2, 6], [3, 6, 7])
+                },
+                this.getBufferParams({
+                        disablePicking: true
+                    })
+            );
+
+            bufferList.push(boxBuffer);
 
             if (!this.cylinderOnly) {
                 var sphereBuffer = new SphereBuffer(
