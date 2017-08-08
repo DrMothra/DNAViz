@@ -304,6 +304,17 @@ class DNAViz {
 }
 
 $(document).ready(function(e){
+
+    $('#hideDetails').on("click", () => {
+        $('#graphs').hide();
+        $('#showInfo').show();
+    });
+
+    $('#showDetails').on("click", () => {
+        $('#graphs').show();
+        $('#showInfo').hide();
+    });
+
     let app = new DNAViz();
     app.createScene("data/output_X.pdb",
         "data/output_B.pdb",
