@@ -78566,67 +78566,52 @@ RepresentationRegistry.add('base', BaseRepresentation);
             let atomData = this.getAtomData(sview);
 
             //Generate slab data
-            for(let atom=0, numAtoms=atomData.position.length; atom<numAtoms; ++atom) {
-                
+            let positions = atomData.position;
+            let height = atomData.radius[0] * 2;
+            let points = [], slab;
+            for(let atom=0, numAtoms=positions.length; atom<numAtoms; atom+=6) {
+                slab = generateSlabData(positions, atom, height);
+                points.push(slab);
             }
 
-            //Get box width, depth
-            let s0 = new Vector3(atomData.position[0], atomData.position[1], atomData.position[2]);
-            let s1 = new Vector3(atomData.position[3], atomData.position[4], atomData.position[5]);
-            let slabWidth = s0.distanceTo(s1);
-            let slabDepth = slabWidth;
-            let slabHeight = atomData.radius[0] * 2;
-            let centrePoint = s0.add(s1).divideScalar(2);
-            let halfWidth = slabWidth/2, halfDepth = slabDepth/2;
-
-            let edgeVectors = [];
-            for(let i=0; i<4; ++i) {
-                edgeVectors.push(new Vector3());
-            }
-            edgeVectors[0].set(-halfWidth, 0, -halfDepth);
-            edgeVectors[1].set(halfWidth, 0, -halfDepth);
-            edgeVectors[2].set(halfWidth, 0, halfDepth);
-            edgeVectors[3].set(-halfWidth, 0, halfDepth);
-
-            let points = [];
-            for(let i = 0; i<8; ++i) {
-                points.push(new Vector3());
-            }
-            for(let i=0; i<4; ++i) {
-                points[i] = points[i].addVectors(centrePoint, edgeVectors[i]);
-                points[i+4].copy(points[i]);
-                points[i+4].y -= slabHeight;
+            let numSlabs = points.length;
+            let pointsPerSlab = points[0].length;
+            let numberSlabPoints = numSlabs * pointsPerSlab * 3;
+            let slabPoints = new Float32Array(numberSlabPoints);
+            let currentPoint, currentSlab, elementsPerSlab = pointsPerSlab*3;
+            for(let i=0; i<numSlabs; ++i) {
+                currentSlab = points[i];
+                currentPoint = 0;
+                for(let j=0; j<elementsPerSlab; j+=3) {
+                    slabPoints[(i*elementsPerSlab) + j] = currentSlab[currentPoint].x;
+                    slabPoints[(i*elementsPerSlab) + j + 1] = currentSlab[currentPoint].y;
+                    slabPoints[(i*elementsPerSlab) + j + 2] = currentSlab[currentPoint].z;
+                    ++currentPoint;
+                }
             }
 
+            //Generate indices
+            let indices = [], currentIndex;
+            for(let slab=0; slab<numSlabs; ++slab) {
+                currentIndex = generateIndices(slab, pointsPerSlab);
+                indices.push(currentIndex);
+            }
+
+            let indicesPerSlab = indices[0].length;
+            let slabIndices = new Uint32Array(numSlabs * indicesPerSlab);
+            for(let i=0; i<numSlabs; ++i) {
+                currentSlab = indices[i];
+                for(let j=0; j<indicesPerSlab; ++j) {
+                    slabIndices[(i*indicesPerSlab) + j] = currentSlab[j];
+                }
+            }
+
+            let slabColour = new Float32Array(slabPoints.length);
+            slabColour.fill(1);
             var shapeBuffer = new MeshBuffer(
-                { position: new Float32Array( [points[0].x, points[0].y, points[0].z,
-                                                points[1].x, points[1].y, points[1].z,
-                                                points[2].x, points[2].y, points[2].z,
-                                                points[3].x, points[3].y, points[3].z,
-                                                points[4].x, points[4].y, points[4].z,
-                                                points[5].x, points[5].y, points[5].z,
-                                                points[6].x, points[6].y, points[6].z,
-                                                points[7].x, points[7].y, points[7].z]),
-                    index: new Uint32Array([1, 0, 3,
-                                            3, 2, 1,
-                                            2, 3, 7,
-                                            7, 6, 2,
-                                            1, 2, 6,
-                                            6, 5, 1,
-                                            0, 1, 5,
-                                            5, 4, 0,
-                                            3, 0, 4,
-                                            4, 7, 3,
-                                            4, 5, 6,
-                                            6, 7, 4]),
-                  color: new Float32Array( [1, 0, 0,
-                                            1, 0, 0,
-                                            1, 0, 0,
-                                            1, 0, 0,
-                                            1, 0, 0,
-                                            1, 0, 0,
-                                            1, 0, 0,
-                                            1, 0, 0])
+                { position: slabPoints,
+                    index: slabIndices,
+                  color: slabColour
                 },
                 this.getBufferParams({
                     side: "front",
@@ -78660,6 +78645,60 @@ RepresentationRegistry.add('base', BaseRepresentation);
     }(BallAndStickRepresentation));
 
     RepresentationRegistry.add('slab', SlabRepresentation);
+
+function generateSlabData(positions, startPoint, height) {
+    //Get box width, depth
+    let start = new Vector3(positions[startPoint], positions[startPoint+1], positions[startPoint+2]);
+    let end = new Vector3(positions[startPoint+3], positions[startPoint+4], positions[startPoint+5]);
+    let slabWidth = start.distanceTo(end);
+    let slabDepth = slabWidth;
+    let slabHeight = height;
+    let centrePoint = start.add(end).divideScalar(2);
+    let halfWidth = slabWidth/2, halfDepth = slabDepth/2;
+
+    let edgeVectors = [];
+    for(let i=0; i<4; ++i) {
+        edgeVectors.push(new Vector3());
+    }
+    edgeVectors[0].set(-halfWidth, 0, -halfDepth);
+    edgeVectors[1].set(halfWidth, 0, -halfDepth);
+    edgeVectors[2].set(halfWidth, 0, halfDepth);
+    edgeVectors[3].set(-halfWidth, 0, halfDepth);
+
+    let points = [];
+    for(let i = 0; i<8; ++i) {
+        points.push(new Vector3());
+    }
+    for(let i=0; i<4; ++i) {
+        points[i] = points[i].addVectors(centrePoint, edgeVectors[i]);
+        points[i+4].copy(points[i]);
+        points[i+4].y -= slabHeight;
+    }
+
+    return points;
+}
+
+let referenceIndex = [1, 0, 3,
+    3, 2, 1,
+    2, 3, 7,
+    7, 6, 2,
+    1, 2, 6,
+    6, 5, 1,
+    0, 1, 5,
+    5, 4, 0,
+    3, 0, 4,
+    4, 7, 3,
+    4, 5, 6,
+    6, 7, 4];
+
+function generateIndices(index, pointsPerSlab) {
+    let indices=[];
+    for(let i=0, numIndices=referenceIndex.length; i<numIndices; ++i) {
+        indices.push(referenceIndex[i] + (pointsPerSlab * index));
+    }
+
+    return indices;
+}
 
 /**
  * @file Spline
