@@ -78562,47 +78562,63 @@ RepresentationRegistry.add('base', BaseRepresentation);
             //DEBUG
             console.log("Slab create data");
 
-            var bondData = this.getBondData(sview);
             var bufferList = [];
             let atomData = this.getAtomData(sview);
 
+            //Generate slab data
+            for(let atom=0, numAtoms=atomData.position.length; atom<numAtoms; ++atom) {
+                
+            }
 
-            //DEBUG
-            /*
-            var shapeBuffer = new CylinderBuffer(
-                bondData,
-                this.getBufferParams({
-                    openEnded: this.openEnded,
-                    radialSegments: this.radialSegments,
-                    disableImpostor: this.disableImpostor,
-                    dullInterior: true
-                })
-            );
-            */
+            //Get box width, depth
+            let s0 = new Vector3(atomData.position[0], atomData.position[1], atomData.position[2]);
+            let s1 = new Vector3(atomData.position[3], atomData.position[4], atomData.position[5]);
+            let slabWidth = s0.distanceTo(s1);
+            let slabDepth = slabWidth;
+            let slabHeight = atomData.radius[0] * 2;
+            let centrePoint = s0.add(s1).divideScalar(2);
+            let halfWidth = slabWidth/2, halfDepth = slabDepth/2;
 
-            let width = 20, height = 20, depth = 20;
-            let halfWidth = width/2, halfHeight = height/2;
+            let edgeVectors = [];
+            for(let i=0; i<4; ++i) {
+                edgeVectors.push(new Vector3());
+            }
+            edgeVectors[0].set(-halfWidth, 0, -halfDepth);
+            edgeVectors[1].set(halfWidth, 0, -halfDepth);
+            edgeVectors[2].set(halfWidth, 0, halfDepth);
+            edgeVectors[3].set(-halfWidth, 0, halfDepth);
+
+            let points = [];
+            for(let i = 0; i<8; ++i) {
+                points.push(new Vector3());
+            }
+            for(let i=0; i<4; ++i) {
+                points[i] = points[i].addVectors(centrePoint, edgeVectors[i]);
+                points[i+4].copy(points[i]);
+                points[i+4].y -= slabHeight;
+            }
+
             var shapeBuffer = new MeshBuffer(
-                { position: new Float32Array( [-halfWidth, -halfHeight, 0,
-                                                halfWidth, -halfHeight, 0,
-                                                halfWidth, halfHeight, 0,
-                                                -halfWidth, halfHeight, 0,
-                                                -halfWidth, halfHeight, -depth,
-                                                halfWidth, halfHeight, -depth,
-                                                halfWidth, -halfHeight, -depth,
-                                                -halfWidth, -halfHeight, -depth]),
-                    index: new Uint32Array([0, 1, 3,
-                                            1, 2, 3,
-                                            3, 2, 4,
-                                            2, 5, 4,
-                                            1, 6, 2,
-                                            6, 5, 2,
-                                            6, 7, 5,
-                                            7, 4, 5,
-                                            7, 0, 4,
-                                            0, 3, 4,
-                                            7, 6, 0,
-                                            6, 1, 0]),
+                { position: new Float32Array( [points[0].x, points[0].y, points[0].z,
+                                                points[1].x, points[1].y, points[1].z,
+                                                points[2].x, points[2].y, points[2].z,
+                                                points[3].x, points[3].y, points[3].z,
+                                                points[4].x, points[4].y, points[4].z,
+                                                points[5].x, points[5].y, points[5].z,
+                                                points[6].x, points[6].y, points[6].z,
+                                                points[7].x, points[7].y, points[7].z]),
+                    index: new Uint32Array([1, 0, 3,
+                                            3, 2, 1,
+                                            2, 3, 7,
+                                            7, 6, 2,
+                                            1, 2, 6,
+                                            6, 5, 1,
+                                            0, 1, 5,
+                                            5, 4, 0,
+                                            3, 0, 4,
+                                            4, 7, 3,
+                                            4, 5, 6,
+                                            6, 7, 4]),
                   color: new Float32Array( [1, 0, 0,
                                             1, 0, 0,
                                             1, 0, 0,
