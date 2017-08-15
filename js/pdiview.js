@@ -103,11 +103,6 @@ class DNAViz {
             {"cameraType": "perspective",
                 "backgroundColor": "black"});
 
-        this.stage.signals.hovered.add(function(d){
-            var msg = getPickingMessage( d, "" );
-            $("#tooltip").html(msg);
-        });
-
         // Create RepresentationGroups for the input PDB
         var pdbRG = this.stage.loadFile(PROTEIN_PATH)
             .then(function(c) {
@@ -330,18 +325,6 @@ function safariw(data, target) {
     var url = URL.createObjectURL( data );
     target.location.href = url;
 }
-
-getPickingMessage = function( d, prefix ){
-    var msg;
-    if( d.atom ){
-        msg = d.atom.qualifiedName();
-    }else if( d.bond ){
-        msg = d.bond.atom1.qualifiedName();
-    }else{
-        msg = "Hover on atoms for details.";
-    }
-    return prefix ? prefix + " " + msg : msg;
-};
 
 /*************************
  * Representation callbacks

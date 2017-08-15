@@ -78808,8 +78808,6 @@ RepresentationRegistry.add('base', BaseRepresentation);
 
             let slabPoints = new Float32Array(positions);
 
-
-
             //Generate indices
             const pointsPerSlab = 8;
             let numSlabs = positions.length/(3*pointsPerSlab);
@@ -78831,6 +78829,10 @@ RepresentationRegistry.add('base', BaseRepresentation);
 
             let slabColour = new Float32Array(slabPoints.length);
             slabColour.fill(1);
+            for(let i=0; i<24; ++i) {
+                slabColour[i] = 0.15;
+            }
+
             var shapeBuffer = new MeshBuffer(
                 { position: slabPoints,
                     index: slabIndices,
@@ -78844,19 +78846,6 @@ RepresentationRegistry.add('base', BaseRepresentation);
 
 
             bufferList.push(shapeBuffer);
-
-            if (!this.cylinderOnly) {
-                var sphereBuffer = new SphereBuffer(
-                    this.getAtomData(sview),
-                    this.getBufferParams({
-                        sphereDetail: this.sphereDetail,
-                        disableImpostor: this.disableImpostor,
-                        dullInterior: true
-                    })
-                );
-
-                bufferList.push(sphereBuffer);
-            }
 
             return {
                 bufferList: bufferList
