@@ -87,6 +87,16 @@ RepresentationGroup.prototype.setParameters = function(what) {
         repr.setParameters(what);
     });
 };
+
+RepresentationGroup.prototype.setComponentParameters = function(index, what) {
+    //Set parameters for this component
+    if(index < 0 || index >= this.reprList.length) {
+        console.log("Invalid index");
+        return;
+    }
+    this.reprList[index].setParameters(what);
+};
+
 RepresentationGroup.prototype.setSelection = function(what) {
     // Show/Hide all representations in group
     this.reprList.forEach(function(repr) {

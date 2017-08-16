@@ -71,13 +71,26 @@ var reference_orientation_component = null;
 let NDBColors;
 class DNAViz {
     constructor() {
-        this.moleculeColours = [
+        let moleculeColours = [
             DNA_COLOURS.MOLECULE_A,
             DNA_COLOURS.MOLECULE_G,
             DNA_COLOURS.MOLECULE_T,
             DNA_COLOURS.MOLECULE_C,
             DNA_COLOURS.MOLECULE_U
         ];
+        let moleculeHexColours = [
+            DNA_HEX_COLOURS.MOLECULE_A,
+            DNA_HEX_COLOURS.MOLECULE_G,
+            DNA_HEX_COLOURS.MOLECULE_T,
+            DNA_HEX_COLOURS.MOLECULE_C,
+        ];
+        this.basePairReps = ["Wire", "Element", "Surface", "Cylinder", "Smooth", "Spacefill", "Slab"];
+        this.basePairRepColours = [];
+        for(let i=0, numPairs = this.basePairReps.length; i<numPairs; ++i) {
+            this.basePairRepColours.push(moleculeHexColours.slice(0));
+        }
+        this.currentRep = 0;
+        this.moleculeColours = moleculeColours;
         this.createColourScheme();
     }
 
@@ -93,9 +106,21 @@ class DNAViz {
             ], "DNA_Protein");
     }
 
+    getRepresentationColours(index) {
+        return this.basePairRepColours[index];
+    }
+
     changeColourScheme(molecule, colour) {
         this.moleculeColours[molecule] = colour;
         this.createColourScheme();
+    }
+
+    changeBasePairColour(molecule, colour) {
+        let base = this.basePairRepColours[this.currentRep];
+        base[molecule] = colour;
+        //DEBUG
+        console.log("Rep = ", this.currentRep);
+        console.log("Colour = ", colour);
     }
 
     createScene(AXIS_PATH, BACKBONE_PATH, CRPATH, PROTEIN_PATH, PPATH, IPATH, SPATH) {
@@ -104,14 +129,14 @@ class DNAViz {
                 "backgroundColor": "black"});
 
         // Create RepresentationGroups for the input PDB
-        var pdbRG = this.stage.loadFile(PROTEIN_PATH)
+        let pdbRG = this.stage.loadFile(PROTEIN_PATH)
             .then(function(c) {
-                var some = do_input(c);
+                let some = do_input(c);
                 //DEBUG
                 //$.extend(some, do_interactions(c, PPATH, IPATH, SPATH));//NEW
                 return some;
             }, error);
-        var axRG, bbRG, crRG;
+        let axRG, bbRG, crRG;
         // Define dummy axis if we lack one
         if(AXIS_PATH != "") {
             // Create RepresentationGroups for the axis PDB
@@ -177,7 +202,7 @@ class DNAViz {
                 G: DNA_HEX_COLOURS.MOLECULE_G,
                 T: DNA_HEX_COLOURS.MOLECULE_T,
                 C: DNA_HEX_COLOURS.MOLECULE_C,
-                Pairs: ["Wire", "Element", "Surface", "Cylinder", "Smooth", "Spacefill", "Slab"],
+                Pairs: this.basePairReps,
                 Protein: ["Cartoon", "Wire", "Surface", "Ribbon", "Rope", "Tube"]
             };
             let visibilityConfig = {
@@ -225,6 +250,16 @@ class DNAViz {
                     selected: 0,
                     onChange: index => {
                         this.onChangeBasePairRepresentation(index);
+                        //Update colour scheme
+                        let colours = this.getRepresentationColours(index);
+                        appearanceConfig.A = colours[0];
+                        appearanceConfig.G = colours[1];
+                        appearanceConfig.T = colours[2];
+                        appearanceConfig.C = colours[3];
+                        //DEBUG
+                        console.log("Rep = ", index);
+                        console.log("Colour = ", appearanceConfig.A);
+                        //controlKit.update();
                     }
                 })
                 .addSelect(appearanceConfig, "Protein", {
@@ -270,11 +305,14 @@ class DNAViz {
 
     onMoleculeColourChanged(molecule, colour) {
         this.changeColourScheme(molecule, colour);
-        this.repData["Nucleic Acid"].setParameters( {"colorScheme": NDBColors} );
+        this.repData["Nucleic Acid"].setComponentParameters(this.currentRep, {"colorScheme": NDBColors} );
+        //Keep track of colours
+        this.changeBasePairColour(molecule, colour);
     }
 
     onChangeBasePairRepresentation(representation) {
         this.repData["Nucleic Acid"].enable(representation);
+        this.currentRep = representation;
     }
 
     onChangeProteinRepresentation(representation) {
