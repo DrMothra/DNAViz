@@ -257,8 +257,8 @@ class DNAViz {
                         appearanceConfig.T = colours[2];
                         appearanceConfig.C = colours[3];
                         //DEBUG
-                        console.log("Rep = ", index);
-                        console.log("Colour = ", appearanceConfig.A);
+                        //console.log("Rep = ", index);
+                        //console.log("Colour = ", appearanceConfig.A);
                         //controlKit.update();
                     }
                 })

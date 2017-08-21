@@ -67522,6 +67522,8 @@ Buffer$1.prototype.setAttributes = function setAttributes (data) {
     } else {
       var attribute = attributes[ name ];
 
+        if(!attribute) continue;
+
       if (length > attribute.array.length) {
         geometry.addAttribute(
                       name,
@@ -78829,6 +78831,7 @@ RepresentationRegistry.add('base', BaseRepresentation);
 
             let slabColour = new Float32Array(slabPoints.length);
             slabColour.fill(1);
+            //DEBUG
             for(let i=0; i<24; ++i) {
                 slabColour[i] = 0.15;
             }
@@ -78850,6 +78853,11 @@ RepresentationRegistry.add('base', BaseRepresentation);
             return {
                 bufferList: bufferList
             }
+        };
+
+        SlabRepresentation.prototype.updateData = function updateData (what, data) {
+            //DEBUG
+            console.log("Update slb data");
         };
 
         return SlabRepresentation;
