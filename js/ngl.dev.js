@@ -65802,7 +65802,35 @@ Structure.prototype.getRungBondData = function getRungBondData (params) {
   return this.getBondData(params)
 };
 
-  //
+// TG - Get bond colour data for slabs - don't need anything else
+Structure.prototype.getBondColourData = function getBondColourData (params) {
+    var p = Object.assign({}, params);
+    if (p.colorParams) { p.colorParams.structure = this.getStructure(); }
+
+    let colormaker = ColormakerRegistry.getScheme(p.colorParams);
+
+    let bondSet = defaults(p.bondSet, this.bondSet);
+    let i=0, i3, bondOrder;
+    var bp = this.getBondProxy();
+    if (p.bondStore) { bp.bondStore = p.bondStore; }
+    var ap1 = this.getAtomProxy();
+    var ap2 = this.getAtomProxy();
+
+    let bondCount = 30;
+    let color1 = new Float32Array(bondCount * 3);
+    let color2 = new Float32Array(bondCount * 3);
+
+    bondSet.forEach(function (index) {
+        i3 = i * 3;
+        bp.index = index;
+        ap1.index = bp.atomIndex1;
+        ap2.index = bp.atomIndex2;
+        bondOrder = bp.bondOrder;
+
+        colormaker.bondColorToArray(bp, 1, color1, i3);
+        colormaker.bondColorToArray(bp, 0, color2, i3);
+    });
+}
 
   /**
    * Gets the bounding box of the (selected) structure atoms
@@ -78557,12 +78585,20 @@ RepresentationRegistry.add('base', BaseRepresentation);
             var p = this.getBondParams(what, params);
             p.colorParams.rung = true;
 
-            return sview.getRungBondData(p)
+            return sview.getRungBondData(p);
+        };
+
+        SlabRepresentation.prototype.getSlabColours = function getSlabColours(sview, what, params) {
+            let p = this.getBondParams(what, params);
+
+            return sview.getBondColourData(p);
         };
 
         SlabRepresentation.prototype.createData = function createData(sview) {
             //DEBUG
             //console.log("Slab create data");
+            let bondData = this.getBondData(sview);
+
             let positions = [
                 53.7275,  59.3055,  25.3825,
                 53.8045 ,  59.34925,  25.61625,
@@ -78829,12 +78865,32 @@ RepresentationRegistry.add('base', BaseRepresentation);
                 }
             }
 
-            let slabColour = new Float32Array(slabPoints.length);
+            let numSlabColourIndices = slabPoints.length;
+            let slabColour = new Float32Array(numSlabColourIndices);
             slabColour.fill(1);
-            //DEBUG
-            for(let i=0; i<24; ++i) {
-                slabColour[i] = 0.15;
+            let colourArray = bondData.color;
+            //Get colour data from bond data
+            let coloursPerSlab = 24, offset, bondNumber = 0;
+            for(let slab=0; slab<numSlabs/2; ++slab) {
+                offset = slab * coloursPerSlab * 2;
+                for(let i=0; i<coloursPerSlab; i+=3) {
+                    slabColour[offset + i] = colourArray[bondNumber];
+                    slabColour[offset + i + 1] = colourArray[bondNumber + 1];
+                    slabColour[offset + i + 2] = colourArray[bondNumber + 2];
+                }
+                bondNumber += 3;
             }
+
+            for(let slab=numSlabs-1; slab>0; slab-=2) {
+                offset = slab * coloursPerSlab;
+                for(let i=0; i<coloursPerSlab; i+=3) {
+                    slabColour[offset + i] = colourArray[bondNumber];
+                    slabColour[offset + i + 1] = colourArray[bondNumber + 1];
+                    slabColour[offset + i + 2] = colourArray[bondNumber + 2];
+                }
+                bondNumber += 3;
+            }
+
 
             var shapeBuffer = new MeshBuffer(
                 { position: slabPoints,
