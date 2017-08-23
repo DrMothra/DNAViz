@@ -78589,15 +78589,45 @@ RepresentationRegistry.add('base', BaseRepresentation);
         };
 
         SlabRepresentation.prototype.getSlabColours = function getSlabColours(sview, what, params) {
-            let p = this.getBondParams(what, params);
+            let bondData = this.getBondData(sview);
 
-            return sview.getBondColourData(p);
+            const coloursPerSlab = 24;
+            let numSlabs = bondData.radius.length;
+            let numSlabColourIndices = numSlabs * coloursPerSlab;
+            let slabColours = new Float32Array(numSlabColourIndices);
+            slabColours.fill(1);
+            let colourArray = bondData.color;
+            //Get colour data from bond data
+            let offset, bondNumber = 0;
+            //First strand up
+            for(let slab=0; slab<numSlabs/2; ++slab) {
+                offset = slab * coloursPerSlab * 2;
+                for(let i=0; i<coloursPerSlab; i+=3) {
+                    slabColours[offset + i] = colourArray[bondNumber];
+                    slabColours[offset + i + 1] = colourArray[bondNumber + 1];
+                    slabColours[offset + i + 2] = colourArray[bondNumber + 2];
+                }
+                bondNumber += 3;
+            }
+
+            //Second strand down
+            for(let slab=numSlabs-1; slab>0; slab-=2) {
+                offset = slab * coloursPerSlab;
+                for(let i=0; i<coloursPerSlab; i+=3) {
+                    slabColours[offset + i] = colourArray[bondNumber];
+                    slabColours[offset + i + 1] = colourArray[bondNumber + 1];
+                    slabColours[offset + i + 2] = colourArray[bondNumber + 2];
+                }
+                bondNumber += 3;
+            }
+
+            return slabColours;
         };
 
         SlabRepresentation.prototype.createData = function createData(sview) {
             //DEBUG
             //console.log("Slab create data");
-            let bondData = this.getBondData(sview);
+
 
             let positions = [
                 53.7275,  59.3055,  25.3825,
@@ -78865,37 +78895,12 @@ RepresentationRegistry.add('base', BaseRepresentation);
                 }
             }
 
-            let numSlabColourIndices = slabPoints.length;
-            let slabColour = new Float32Array(numSlabColourIndices);
-            slabColour.fill(1);
-            let colourArray = bondData.color;
-            //Get colour data from bond data
-            let coloursPerSlab = 24, offset, bondNumber = 0;
-            for(let slab=0; slab<numSlabs/2; ++slab) {
-                offset = slab * coloursPerSlab * 2;
-                for(let i=0; i<coloursPerSlab; i+=3) {
-                    slabColour[offset + i] = colourArray[bondNumber];
-                    slabColour[offset + i + 1] = colourArray[bondNumber + 1];
-                    slabColour[offset + i + 2] = colourArray[bondNumber + 2];
-                }
-                bondNumber += 3;
-            }
-
-            for(let slab=numSlabs-1; slab>0; slab-=2) {
-                offset = slab * coloursPerSlab;
-                for(let i=0; i<coloursPerSlab; i+=3) {
-                    slabColour[offset + i] = colourArray[bondNumber];
-                    slabColour[offset + i + 1] = colourArray[bondNumber + 1];
-                    slabColour[offset + i + 2] = colourArray[bondNumber + 2];
-                }
-                bondNumber += 3;
-            }
-
+            let slabColours = this.getSlabColours(sview);
 
             var shapeBuffer = new MeshBuffer(
                 { position: slabPoints,
                     index: slabIndices,
-                  color: slabColour
+                  color: slabColours
                 },
                 this.getBufferParams({
                     side: "front",
@@ -78913,7 +78918,17 @@ RepresentationRegistry.add('base', BaseRepresentation);
 
         SlabRepresentation.prototype.updateData = function updateData (what, data) {
             //DEBUG
-            console.log("Update slb data");
+            //console.log("Update slb data");
+
+            let slabColours = this.getSlabColours(data.sview);
+
+            let slabData = {};
+
+            if (!what || what.color) {
+                slabData.color = slabColours;
+            }
+
+            data.bufferList[ 0 ].setAttributes(slabData);
         };
 
         return SlabRepresentation;
