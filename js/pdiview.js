@@ -212,6 +212,7 @@ class DNAViz {
                 Protein: true
             };
 
+            let _this = this;
             let controlKit = new ControlKit();
 
             controlKit.addPanel({width: 200})
@@ -248,14 +249,17 @@ class DNAViz {
                 })
                 .addSelect(appearanceConfig, "Pairs", {
                     selected: 0,
-                    onChange: index => {
-                        this.onChangeBasePairRepresentation(index);
+                    onChange: function(index) {
+                        _this.onChangeBasePairRepresentation(index);
                         //Update colour scheme
-                        let colours = this.getRepresentationColours(index);
+                        let colours = _this.getRepresentationColours(index);
                         appearanceConfig.A = colours[0];
                         appearanceConfig.G = colours[1];
                         appearanceConfig.T = colours[2];
                         appearanceConfig.C = colours[3];
+
+                        //Fixes update bug in control kit
+                        this.applyValue();
 
                         //DEBUG
                         //console.log("Rep = ", index);
