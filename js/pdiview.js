@@ -256,6 +256,7 @@ class DNAViz {
                         appearanceConfig.G = colours[1];
                         appearanceConfig.T = colours[2];
                         appearanceConfig.C = colours[3];
+
                         //DEBUG
                         //console.log("Rep = ", index);
                         //console.log("Colour = ", appearanceConfig.A);
@@ -288,7 +289,7 @@ class DNAViz {
                     onChange: () => {
                         this.toggleProtein();
                     }
-                })
+                });
         });
     }
 
