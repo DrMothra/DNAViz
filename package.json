@@ -1,0 +1,28 @@
+{
+  "name": "dnaviz",
+  "version": "1.0.0",
+  "description": "Visualisation of DNA",
+  "main": "index.js",
+  "dependencies": {
+    "babel-core": "^6.26.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^7.0.0"
+  },
+  "devDependencies": {
+    "babel-preset-env": "^1.6.0",
+    "gulp": "^3.9.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DrMothra/DNAViz.git"
+  },
+  "author": "Dr Tony Glover",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DrMothra/DNAViz/issues"
+  },
+  "homepage": "https://github.com/DrMothra/DNAViz#readme"
+}
