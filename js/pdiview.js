@@ -66,6 +66,22 @@ var NDBColors = NGL.ColormakerRegistry.addSelectionScheme( [ // A red, T blue, C
 var DEBUG = false;
 
 /* GLOBALS */
+let basePairReps = ["Wire", "Element", "Surface", "Cylinder", "Smooth", "Spacefill", "Slab"];
+let appearanceConfig = {
+    Back: '#000000',
+    BBone: '#8b0000',
+    A: DNA_HEX_COLOURS.MOLECULE_A,
+    G: DNA_HEX_COLOURS.MOLECULE_G,
+    T: DNA_HEX_COLOURS.MOLECULE_T,
+    C: DNA_HEX_COLOURS.MOLECULE_C,
+    Pairs: basePairReps,
+    Protein: ["Cartoon", "Wire", "Surface", "Ribbon", "Rope", "Tube"]
+};
+
+let saveConfig = {
+    Back: '#000000'
+};
+
 var dna_axis, orientation, zoom;
 var reference_orientation_component = null;
 let NDBColors;
@@ -84,14 +100,29 @@ class DNAViz {
             DNA_HEX_COLOURS.MOLECULE_T,
             DNA_HEX_COLOURS.MOLECULE_C,
         ];
-        this.basePairReps = ["Wire", "Element", "Surface", "Cylinder", "Smooth", "Spacefill", "Slab"];
+        this.basePairReps = basePairReps;
         this.basePairRepColours = [];
         for(let i=0, numPairs = this.basePairReps.length; i<numPairs; ++i) {
             this.basePairRepColours.push(moleculeHexColours.slice(0));
         }
         this.currentRep = 0;
         this.moleculeColours = moleculeColours;
+        this.baseName = "DNAVizConfig";
+    }
+
+    init() {
         this.createColourScheme();
+        //Load any preferences
+        let prefs = localStorage.getItem(this.baseName + "Saved");
+        if(prefs) {
+            let value;
+            for (let prop in appearanceConfig) {
+                value = localStorage.getItem(this.baseName + prop);
+                if (value) {
+                    this.setGUI(prop, value);
+                }
+            }
+        }
     }
 
     createColourScheme() {
@@ -126,7 +157,7 @@ class DNAViz {
     createScene(AXIS_PATH, BACKBONE_PATH, CRPATH, PROTEIN_PATH, PPATH, IPATH, SPATH) {
         this.stage = new NGL.Stage("viewport",
             {"cameraType": "perspective",
-                "backgroundColor": "black"});
+                "backgroundColor": appearanceConfig.Back});
 
         // Create RepresentationGroups for the input PDB
         let pdbRG = this.stage.loadFile(PROTEIN_PATH)
@@ -195,16 +226,7 @@ class DNAViz {
     createGUI() {
         //Create GUI - controlKit
         window.addEventListener('load', () => {
-            let appearanceConfig = {
-                Back: '#000000',
-                BBone: '#8b0000',
-                A: DNA_HEX_COLOURS.MOLECULE_A,
-                G: DNA_HEX_COLOURS.MOLECULE_G,
-                T: DNA_HEX_COLOURS.MOLECULE_T,
-                C: DNA_HEX_COLOURS.MOLECULE_C,
-                Pairs: this.basePairReps,
-                Protein: ["Cartoon", "Wire", "Surface", "Ribbon", "Rope", "Tube"]
-            };
+
             let visibilityConfig = {
                 NAcid: true,
                 BBone: true,
@@ -216,84 +238,93 @@ class DNAViz {
             let controlKit = new ControlKit();
 
             controlKit.addPanel({width: 200})
-                .addGroup({label: "Appearance", enable: false})
-                .addColor(appearanceConfig, "Back", {
-                    colorMode: "hex", onChange: () => {
-                        this.onBackgroundColourChanged(appearanceConfig.Back);
-                    }
-                })
-                .addColor(appearanceConfig, "BBone", {
-                    colorMode: "hex", onChange: () => {
-                        this.onBackboneColourChanged(appearanceConfig.BBone);
-                    }
-                })
-                .addColor(appearanceConfig, "A", {
-                    colorMode: "hex", onChange: () => {
-                        this.onMoleculeColourChanged(MOLECULES.A, appearanceConfig.A);
-                    }
-                })
-                .addColor(appearanceConfig, "G", {
-                    colorMode: "hex", onChange: () => {
-                        this.onMoleculeColourChanged(MOLECULES.G, appearanceConfig.G);
-                    }
-                })
-                .addColor(appearanceConfig, "T", {
-                    colorMode: "hex", onChange: () => {
-                        this.onMoleculeColourChanged(MOLECULES.T, appearanceConfig.T);
-                    }
-                })
-                .addColor(appearanceConfig, "C", {
-                    colorMode: "hex", onChange: () => {
-                        this.onMoleculeColourChanged(MOLECULES.C, appearanceConfig.C);
-                    }
-                })
-                .addSelect(appearanceConfig, "Pairs", {
-                    selected: 0,
-                    onChange: function(index) {
-                        _this.onChangeBasePairRepresentation(index);
-                        //Update colour scheme
-                        let colours = _this.getRepresentationColours(index);
-                        appearanceConfig.A = colours[0];
-                        appearanceConfig.G = colours[1];
-                        appearanceConfig.T = colours[2];
-                        appearanceConfig.C = colours[3];
+                .addSubGroup({label: "Appearance", enable: false})
+                    .addColor(appearanceConfig, "Back", {
+                        colorMode: "hex", onChange: () => {
+                            this.onBackgroundColourChanged(appearanceConfig.Back);
+                        }
+                    })
+                    .addColor(appearanceConfig, "BBone", {
+                        colorMode: "hex", onChange: () => {
+                            this.onBackboneColourChanged(appearanceConfig.BBone);
+                        }
+                    })
+                    .addColor(appearanceConfig, "A", {
+                        colorMode: "hex", onChange: () => {
+                            this.onMoleculeColourChanged(MOLECULES.A, appearanceConfig.A);
+                        }
+                    })
+                    .addColor(appearanceConfig, "G", {
+                        colorMode: "hex", onChange: () => {
+                            this.onMoleculeColourChanged(MOLECULES.G, appearanceConfig.G);
+                        }
+                    })
+                    .addColor(appearanceConfig, "T", {
+                        colorMode: "hex", onChange: () => {
+                            this.onMoleculeColourChanged(MOLECULES.T, appearanceConfig.T);
+                        }
+                    })
+                    .addColor(appearanceConfig, "C", {
+                        colorMode: "hex", onChange: () => {
+                            this.onMoleculeColourChanged(MOLECULES.C, appearanceConfig.C);
+                        }
+                    })
+                    .addSelect(appearanceConfig, "Pairs", {
+                        selected: 0,
+                        onChange: index => {
+                            this.onChangeBasePairRepresentation(index);
+                            //Update colour scheme
+                            let colours = _this.getRepresentationColours(index);
+                            appearanceConfig.A = colours[0];
+                            appearanceConfig.G = colours[1];
+                            appearanceConfig.T = colours[2];
+                            appearanceConfig.C = colours[3];
 
-                        //Fixes update bug in control kit
-                        this.applyValue();
+                            //Fixes update bug in control kit
+                            this.applyValue();
 
-                        //DEBUG
-                        //console.log("Rep = ", index);
-                        //console.log("Colour = ", appearanceConfig.A);
-                        //controlKit.update();
-                    }
-                })
-                .addSelect(appearanceConfig, "Protein", {
-                    selected: 0,
-                    onChange: index => {
-                        this.onChangeProteinRepresentation(index);
-                    }
-                })
-                .addGroup({label: "Visibility", enable: false})
-                .addCheckbox(visibilityConfig, "NAcid", {
-                    onChange: () => {
-                        this.toggleAcid();
-                    }
-                })
-                .addCheckbox(visibilityConfig, "BBone", {
-                    onChange: () => {
-                        this.toggleBackbone();
-                    }
-                })
-                .addCheckbox(visibilityConfig, "Axis", {
-                    onChange: () => {
-                        this.toggleAxis();
-                    }
-                })
-                .addCheckbox(visibilityConfig, "Protein", {
-                    onChange: () => {
-                        this.toggleProtein();
-                    }
-                });
+                            //DEBUG
+                            //console.log("Rep = ", index);
+                            //console.log("Colour = ", appearanceConfig.A);
+                            //controlKit.update();
+                        }
+                    })
+                    .addSelect(appearanceConfig, "Protein", {
+                        selected: 0,
+                        onChange: index => {
+                            this.onChangeProteinRepresentation(index);
+                        }
+                    })
+                .addSubGroup({label: "Visibility", enable: false})
+                    .addCheckbox(visibilityConfig, "NAcid", {
+                        onChange: () => {
+                            this.toggleAcid();
+                        }
+                    })
+                    .addCheckbox(visibilityConfig, "BBone", {
+                        onChange: () => {
+                            this.toggleBackbone();
+                        }
+                    })
+                    .addCheckbox(visibilityConfig, "Axis", {
+                        onChange: () => {
+                            this.toggleAxis();
+                        }
+                    })
+                    .addCheckbox(visibilityConfig, "Protein", {
+                        onChange: () => {
+                            this.toggleProtein();
+                        }
+                    })
+                .addSubGroup( {label: "Preferences"} )
+                    .addButton("Save", () => {
+                        for(let prop in saveConfig) {
+                            if(prop in appearanceConfig) {
+                                saveConfig[prop] = appearanceConfig[prop];
+                            }
+                        }
+                        this.savePreferences(saveConfig);
+                    });
         });
     }
 
@@ -339,6 +370,22 @@ class DNAViz {
     toggleProtein() {
         this.repData["Protein"].toggle();
     }
+
+    setGUI(prop, value) {
+        let newValue = parseFloat(value);
+        if(isNaN(newValue)) {
+            appearanceConfig[prop] = value;
+            return;
+        }
+        appearanceConfig[prop] = newValue;
+    }
+
+    savePreferences(config) {
+        for(let prop in config) {
+            localStorage.setItem(this.baseName + prop, config[prop]);
+        }
+        localStorage.setItem(this.baseName+"Saved", "Saved");
+    }
 }
 
 $(document).ready(function(e){
@@ -354,6 +401,7 @@ $(document).ready(function(e){
     });
 
     let app = new DNAViz();
+    app.init();
     app.createScene("data/output_X.pdb",
         "data/output_B.pdb",
         "data/output_R.pdb",
