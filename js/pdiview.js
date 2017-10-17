@@ -108,6 +108,7 @@ class DNAViz {
         this.currentRep = 0;
         this.moleculeColours = moleculeColours;
         this.baseName = "DNAVizConfig";
+        this.messageTimer = 3 * 1000;
     }
 
     init() {
@@ -385,6 +386,15 @@ class DNAViz {
             localStorage.setItem(this.baseName + prop, config[prop]);
         }
         localStorage.setItem(this.baseName+"Saved", "Saved");
+        this.displayMessage("Preferences saved");
+    }
+
+    displayMessage(msg) {
+        $('#content').html(msg);
+        $('#message').show();
+        setTimeout( () => {
+            $('#message').hide();
+        }, this.messageTimer);
     }
 }
 
