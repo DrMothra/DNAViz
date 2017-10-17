@@ -130,9 +130,9 @@ class DNAViz {
         NDBColors = NGL.ColormakerRegistry.addSelectionScheme(
             [
                 [this.moleculeColours[0], "DA or A"],
-                [this.moleculeColours[1], "DG or G"],
+                [this.moleculeColours[3], "DG or G"],
                 [this.moleculeColours[2], "DT"],
-                [this.moleculeColours[3], "DC or C"],
+                [this.moleculeColours[1], "DC or C"],
                 [this.moleculeColours[4], "U"],
                 ["gray", "*"]
             ], "DNA_Protein");
@@ -413,6 +413,16 @@ $(document).ready(function(e){
     $('#showDetails').on("click", () => {
         $('#graphs').show();
         $('#showInfo').hide();
+    });
+
+    $('#hideSequence').on("click", () => {
+        $('#sequenceInfo').hide();
+        $('#toggleSequenceInfo').show();
+    });
+
+    $('#showSequence').on("click", () => {
+        $('#sequenceInfo').show();
+        $('#toggleSequenceInfo').hide();
     });
 
     let app = new DNAViz();

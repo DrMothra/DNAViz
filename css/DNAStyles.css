@@ -80,6 +80,22 @@ body {
     right: 3%;
     bottom: 1%;
 }
+#sequenceInfo {
+    top: 1%;
+    right: 10%;
+    width: 30%;
+}
+#sequenceInfo img {
+    width: 100%;
+}
+#toggleSequenceInfo {
+    top: 1%;
+    right: 12.5%;
+}
+#toggleSequence {
+    top: 1%;
+    right: 20%;
+}
 #message {
     bottom: 5%;
     width: 33.3%;

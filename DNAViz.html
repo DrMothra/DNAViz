@@ -12,10 +12,10 @@
     <script type="text/javascript" src="js/bootstrap.min.js"></script>
     <script type="text/javascript" src="js/ngl.dev.js?v=0.3"></script>
     <script type="text/javascript" src="js/controlKit.js?v=0.2"></script>
-    <script type="text/javascript" src="js/moleculeConfig.js?v=0.1"></script>
+    <script type="text/javascript" src="js/moleculeConfig.js?v=0.2"></script>
     <script type="text/javascript" src="js/representationgroup.js"></script>
     <script type="text/javascript" src="js/detector.js"></script>
-    <script type="text/javascript" src="js/pdiview.js?v=0.9"></script>
+    <script type="text/javascript" src="js/pdiview.js?v=0.10"></script>
 </head>
 <body>
     <div id="viewport">
@@ -24,9 +24,6 @@
 
     <div id="graphs" class="infoPanel noDisplay">
         <div class="centred">
-            <div>
-                <img src="images/logo.png">
-            </div>
             <div>
                 <img src="images/riseL.png">
             </div>
@@ -37,6 +34,17 @@
         <div id="toggleContainer" class="infoPanel">
             <button id="hideDetails" type="button" class="btn btn-primary">Hide Details</button>
         </div>
+    </div>
+
+    <div id="sequenceInfo" class="infoPanel centred">
+        <img src="images/logoClearWhite.png">
+        <div id="toggleSequence" class="infoPanel">
+            <button id="hideSequence" type="button" class="btn btn-primary">Hide</button>
+        </div>
+    </div>
+
+    <div id="toggleSequenceInfo" class="infoPanel noDisplay">
+        <button id="showSequence" type="button" class="btn btn-primary">Show sequence</button>
     </div>
 
     <div id="showInfo" class="infoPanel">
