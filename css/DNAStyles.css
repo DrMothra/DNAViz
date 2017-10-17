@@ -93,3 +93,13 @@ body {
 #message img {
     width: 10%;
 }
+#notSupported {
+    top: 20%;
+    left: 12.5%;
+    width: 75%;
+    background-color: #3e3e3e;
+    color: white;
+    font-size: 1.25vw;
+    border-radius: 15px;
+    padding: 1%;
+}

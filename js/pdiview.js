@@ -400,6 +400,11 @@ class DNAViz {
 
 $(document).ready(function(e){
 
+    if(!Detector.webgl) {
+        $("#notSupported").show();
+        return;
+    }
+
     $('#hideDetails').on("click", () => {
         $('#graphs').hide();
         $('#showInfo').show();
