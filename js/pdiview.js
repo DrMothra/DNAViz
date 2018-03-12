@@ -406,23 +406,23 @@ $(document).ready(function(e){
     }
 
     $('#hideDetails').on("click", () => {
-        $('#graphs').hide();
-        $('#showInfo').show();
+        $('#graphs').addClass("d-none");
+        $('#showInfo').removeClass("d-none");
     });
 
     $('#showDetails').on("click", () => {
-        $('#graphs').show();
-        $('#showInfo').hide();
+        $('#graphs').removeClass("d-none");
+        $('#showInfo').addClass("d-none");
     });
 
     $('#hideSequence').on("click", () => {
-        $('#sequenceInfo').hide();
-        $('#toggleSequenceInfo').show();
+        $('#sequenceInfo').addClass("d-none");
+        $('#toggleSequenceInfo').removeClass("d-none");
     });
 
     $('#showSequence').on("click", () => {
-        $('#sequenceInfo').show();
-        $('#toggleSequenceInfo').hide();
+        $('#sequenceInfo').removeClass("d-none");
+        $('#toggleSequenceInfo').addClass("d-none");
     });
 
     let app = new DNAViz();

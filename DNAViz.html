@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
     <title>DNAViz</title>
 
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/bootstrap-theme.min.css">
     <link rel='stylesheet' href="css/DNAStyles.css?v=0.2">
 
     <script type="text/javascript" src="js/jquery-1.11.2.min.js"></script>
@@ -19,51 +20,50 @@
 </head>
 <body>
     <div id="viewport">
-
-    </div>
-
-    <div id="graphs" class="infoPanel noDisplay">
-        <div class="centred separate">
-            <div>
-                <img src="images/riseL.png">
+        <div id="graphs" class="infoPanel d-none">
+            <div class="text-center separate">
+                <div>
+                    <img class="img-fluid" src="images/riseL.png">
+                </div>
+                <div>
+                    <img class="img-fluid" src="images/rise.png">
+                </div>
+                <div>
+                    <img class="img-fluid" src="images/buckle.png">
+                </div>
             </div>
-            <div>
-                <img src="images/rise.png">
-            </div>
-            <div>
-                <img src="images/buckle.png">
+            <div id="toggleContainer" class="infoPanel">
+                <button id="hideDetails" type="button" class="btn btn-primary">Hide</button>
             </div>
         </div>
-        <div id="toggleContainer" class="infoPanel">
-            <button id="hideDetails" type="button" class="btn btn-primary">Hide</button>
+
+        <div id="sequenceInfo" class="infoPanel text-center d-none">
+            <img class="img-fluid" src="images/logoClearWhite.png">
+            <div id="toggleSequence" class="infoPanel">
+                <button id="hideSequence" type="button" class="btn btn-primary">Hide</button>
+            </div>
+        </div>
+
+        <div id="toggleSequenceInfo" class="infoPanel">
+            <button id="showSequence" type="button" class="btn btn-primary">Show sequence</button>
+        </div>
+
+        <div id="showInfo" class="infoPanel">
+            <button id="showDetails" type="button" class="btn btn-primary">Show Helical</button>
+        </div>
+
+        <div id="message" class="infoPanel text-center d-none">
+            <p>
+                <img src="images/messenger.png"><span id="content"></span>
+            </p>
+        </div>
+
+        <div id="notSupported" class="infoPanel text-center d-none">
+            <p>
+                <img src="images/warning.png"> Your browser does not support WebGL. Please update to the latest version of Chrome or Firefox.
+            </p>
         </div>
     </div>
 
-    <div id="sequenceInfo" class="infoPanel centred">
-        <img src="images/logoClearWhite.png">
-        <div id="toggleSequence" class="infoPanel">
-            <button id="hideSequence" type="button" class="btn btn-primary">Hide</button>
-        </div>
-    </div>
-
-    <div id="toggleSequenceInfo" class="infoPanel noDisplay">
-        <button id="showSequence" type="button" class="btn btn-primary">Show sequence</button>
-    </div>
-
-    <div id="showInfo" class="infoPanel">
-        <button id="showDetails" type="button" class="btn btn-primary">Show Helical</button>
-    </div>
-
-    <div id="message" class="infoPanel centred noDisplay">
-        <p>
-            <img src="images/messenger.png"><span id="content"></span>
-        </p>
-    </div>
-
-    <div id="notSupported" class="infoPanel centred noDisplay">
-        <p>
-            <img src="images/warning.png"> Your browser does not support WebGL. Please update to the latest version of Chrome or Firefox.
-        </p>
-    </div>
 </body>
 </html>
