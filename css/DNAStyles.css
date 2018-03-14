@@ -69,6 +69,10 @@ body {
     top: 1%;
     right: 20%;
 }
+#rotContainer {
+    left: 45%;
+    top: 1%;
+}
 #message {
     bottom: 5%;
     width: 33.3%;

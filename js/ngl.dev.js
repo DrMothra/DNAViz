@@ -50497,6 +50497,17 @@ function Viewer (idOrElement) {
   var parameters;
   initParams();
 
+  //Rotation parameters
+  let modelRotate = false;
+  const rotSpeed = Math.PI/20;
+  const delta = 1/60;
+  let rotDirection = 1;
+
+  //Init clock
+  let clock = new Clock();
+  clock.start();
+  //console.log("Clock started");
+
   var stats;
   initStats();
 
@@ -51208,6 +51219,11 @@ function Viewer (idOrElement) {
 
     renderPending = true;
 
+    if(modelRotate) {
+        console.log("Rotating model");
+        rotationGroup.rotation.y += (rotSpeed * rotDirection * delta);
+    }
+
     window.requestAnimationFrame(function requestRenderAnimation () {
       render();
       stats.update();
@@ -51435,6 +51451,9 @@ function Viewer (idOrElement) {
 
   this.rotationGroup = rotationGroup;
   this.translationGroup = translationGroup;
+
+  this.modelRotate = modelRotate;
+  this.rotDirection = rotDirection;
 
   this.add = add;
   this.remove = remove;
@@ -73942,6 +73961,29 @@ var Stage = function Stage (idOrElement, params) {
   this.setParameters(p);// must come after the viewer has been instantiated
 
   this.viewer.animate();
+
+  this.spinAxis = new Vector3(0, 1, 0);
+};
+
+Stage.prototype.setRotation = function setRotation(rotX, rotY, rotZ) {
+    let euler = new Euler(rotX, rotY, rotZ, "XYZ");
+    let quat = new Quaternion();
+    quat.setFromEuler(euler);
+    this.viewerControls.rotate(quat);
+};
+
+Stage.prototype.setYRot = function setYRot(rotation) {
+    this.viewer.rotationGroup.rotation.y = rotation;
+    this.viewer.requestRender();
+};
+
+Stage.prototype.setZRot =  function setZRot(rotation) {
+    this.viewer.rotationGroup.rotation.z = rotation;
+    this.viewer.requestRender();
+};
+
+Stage.prototype.rotateModel = function rotateModel(direction) {
+    this.viewerControls.spin(this.spinAxis, Math.PI/8);
 };
 
 /**

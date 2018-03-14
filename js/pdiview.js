@@ -85,6 +85,9 @@ let saveConfig = {
 var dna_axis, orientation, zoom;
 var reference_orientation_component = null;
 let NDBColors;
+const DEFAULT_X_ROT = -Math.PI/4;
+const DEFAULT_Y_ROT = 0;
+const DEFAULT_Z_ROT = Math.PI/2;
 class DNAViz {
     constructor() {
         let moleculeColours = [
@@ -215,6 +218,8 @@ class DNAViz {
                 RGdata["Curvature"].GUI("crdisplay", true);
             if(RGdata["Protein"])
                 RGdata["Protein"].GUI("prodisplay", true);
+            //Set initial orientation
+            this.stage.setRotation(DEFAULT_X_ROT, DEFAULT_Y_ROT, DEFAULT_Z_ROT);
         });
 
         window.addEventListener(
@@ -222,6 +227,10 @@ class DNAViz {
                 this.stage.handleResize();
             }, false
         );
+    }
+
+    rotateModel(direction) {
+        this.stage.rotateModel(direction);
     }
 
     createGUI() {
@@ -425,6 +434,7 @@ $(document).ready(function(e){
         $('#toggleSequenceInfo').addClass("d-none");
     });
 
+
     let app = new DNAViz();
     app.init();
     app.createScene("data/output_X.pdb",
@@ -435,6 +445,10 @@ $(document).ready(function(e){
         "data/interactions.dat",
         "data/sequence.dat");
     app.createGUI();
+
+    $('#rotateY').on("click", () => {
+        app.rotateModel(1);
+    });
 });
 
 function safariw(data, target) {
