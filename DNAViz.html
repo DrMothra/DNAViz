@@ -11,12 +11,12 @@
 
     <script type="text/javascript" src="js/jquery-1.11.2.min.js"></script>
     <script type="text/javascript" src="js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="js/ngl.dev.js?v=0.2"></script>
+    <script type="text/javascript" src="js/ngl.dev.js?v=0.5"></script>
     <script type="text/javascript" src="js/controlKit.js?v=0.2"></script>
     <script type="text/javascript" src="js/moleculeConfig.js?v=0.2"></script>
     <script type="text/javascript" src="js/representationgroup.js"></script>
     <script type="text/javascript" src="js/detector.js"></script>
-    <script type="text/javascript" src="js/pdiview.js?v=0.7"></script>
+    <script type="text/javascript" src="js/pdiview.js?v=0.1"></script>
 </head>
 <body>
     <div id="viewport">
@@ -37,6 +37,14 @@
             </div>
         </div>
 
+        <div id="rotateControls" class="infoPanel text-center">
+            <p>Rotate</p>
+            <div>
+                <button id="camLeft" type="button" class="btn btn-primary"><img class="img-fluid" src="images/leftWhite.png"></button>
+                <button id="camRight" type="button" class="btn btn-primary"><img class="img-fluid" src="images/rightWhite.png"></button>
+            </div>
+        </div>
+
         <div id="sequenceInfo" class="infoPanel text-center d-none">
             <img class="img-fluid" src="images/logoClearWhite.png">
             <div id="toggleSequence" class="infoPanel">
@@ -46,10 +54,6 @@
 
         <div id="toggleSequenceInfo" class="infoPanel">
             <button id="showSequence" type="button" class="btn btn-primary">Show sequence</button>
-        </div>
-
-        <div id="rotContainer" class="infoPanel">
-            <button id="rotateY" type="button" class="btn btn-primary">Rotate</button>
         </div>
 
         <div id="showInfo" class="infoPanel">

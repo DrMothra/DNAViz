@@ -446,8 +446,12 @@ $(document).ready(function(e){
         "data/sequence.dat");
     app.createGUI();
 
-    $('#rotateY').on("click", () => {
+    $('#rotateY').on("mousedown", () => {
         app.rotateModel(1);
+    });
+
+    $('#rotateY').on("mouseup", () => {
+        app.rotateModel(0);
     });
 });
 

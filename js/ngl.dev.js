@@ -50494,19 +50494,17 @@ function Viewer (idOrElement) {
   var rendering, renderPending, lastRenderedPicking, isStill;
   var sampleLevel, cDist, bRadius;
 
+  //Rotation parameters
+  let deltaTime = 1/60, lastTime = 0;
+  let isRotating = false;
+  let spinAxis = new Vector3(0, 1, 0);
+  let rotDirection = 1;
+  let rotSpeed = Math.PI/20;
+  let tmpRotateMatrix = new Matrix4();
+  let tmpRotateVector = new Vector3();
+
   var parameters;
   initParams();
-
-  //Rotation parameters
-  let modelRotate = false;
-  const rotSpeed = Math.PI/20;
-  const delta = 1/60;
-  let rotDirection = 1;
-
-  //Init clock
-  let clock = new Clock();
-  clock.start();
-  //console.log("Clock started");
 
   var stats;
   initStats();
@@ -50578,6 +50576,10 @@ function Viewer (idOrElement) {
       sampleLevel: 0
 
     };
+  }
+
+  function setRotating(rotate) {
+      isRotating = rotate;
   }
 
   function initCamera () {
@@ -51139,6 +51141,7 @@ function Viewer (idOrElement) {
     signals.ticked.dispatch(stats);
     var delta = window.performance.now() - stats.startTime;
 
+    /*
     if (delta > 500 && !isStill && sampleLevel < 3 && sampleLevel !== -1) {
       var currentSampleLevel = sampleLevel;
       sampleLevel = 3;
@@ -51147,6 +51150,15 @@ function Viewer (idOrElement) {
       isStill = true;
       sampleLevel = currentSampleLevel;
       if (exports.Debug) { Log.log('rendered still frame'); }
+    }
+    */
+
+    if(isRotating) {
+        tmpRotateMatrix.getInverse(rotationGroup.matrix);
+        tmpRotateVector.copy(ensureVector3(spinAxis)).applyMatrix4(tmpRotateMatrix);
+
+        rotationGroup.rotateOnAxis(tmpRotateVector, rotSpeed * rotDirection * deltaTime);
+        render();
     }
 
     window.requestAnimationFrame(animate);
@@ -51218,11 +51230,6 @@ function Viewer (idOrElement) {
     }
 
     renderPending = true;
-
-    if(modelRotate) {
-        console.log("Rotating model");
-        rotationGroup.rotation.y += (rotSpeed * rotDirection * delta);
-    }
 
     window.requestAnimationFrame(function requestRenderAnimation () {
       render();
@@ -51452,8 +51459,8 @@ function Viewer (idOrElement) {
   this.rotationGroup = rotationGroup;
   this.translationGroup = translationGroup;
 
-  this.modelRotate = modelRotate;
-  this.rotDirection = rotDirection;
+  this.isRotating = isRotating;
+  this.setRotating = setRotating;
 
   this.add = add;
   this.remove = remove;
@@ -73961,8 +73968,6 @@ var Stage = function Stage (idOrElement, params) {
   this.setParameters(p);// must come after the viewer has been instantiated
 
   this.viewer.animate();
-
-  this.spinAxis = new Vector3(0, 1, 0);
 };
 
 Stage.prototype.setRotation = function setRotation(rotX, rotY, rotZ) {
@@ -73972,20 +73977,9 @@ Stage.prototype.setRotation = function setRotation(rotX, rotY, rotZ) {
     this.viewerControls.rotate(quat);
 };
 
-Stage.prototype.setYRot = function setYRot(rotation) {
-    this.viewer.rotationGroup.rotation.y = rotation;
-    this.viewer.requestRender();
-};
-
-Stage.prototype.setZRot =  function setZRot(rotation) {
-    this.viewer.rotationGroup.rotation.z = rotation;
-    this.viewer.requestRender();
-};
-
 Stage.prototype.rotateModel = function rotateModel(direction) {
-    this.viewerControls.spin(this.spinAxis, Math.PI/8);
-};
-
+    this.viewer.setRotating(direction === 0 ? false : true);
+}
 /**
  * Set stage parameters
  * @param {StageParameters} params - stage parameters

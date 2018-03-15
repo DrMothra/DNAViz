@@ -69,9 +69,13 @@ body {
     top: 1%;
     right: 20%;
 }
-#rotContainer {
-    left: 45%;
-    top: 1%;
+#rotateControls {
+    right: 2%;
+    bottom: 2%;
+    width: 10%;
+}
+#rotateControls img {
+    width: 45%;
 }
 #message {
     bottom: 5%;
