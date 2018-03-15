@@ -50494,7 +50494,7 @@ function Viewer (idOrElement) {
   var rendering, renderPending, lastRenderedPicking, isStill;
   var sampleLevel, cDist, bRadius;
 
-  //Rotation parameters
+  //Rotation/zooming parameters
   let deltaTime = 1/60, lastTime = 0;
   let isRotating = false;
   let spinAxis = new Vector3(0, 1, 0);
@@ -50502,6 +50502,9 @@ function Viewer (idOrElement) {
   let rotSpeed = Math.PI/20;
   let tmpRotateMatrix = new Matrix4();
   let tmpRotateVector = new Vector3();
+  let isZoomingIn = false;
+  let isZoomingOut = false;
+  let zoomDelta = 0.1;
 
   var parameters;
   initParams();
@@ -50580,6 +50583,18 @@ function Viewer (idOrElement) {
 
   function setRotating(rotate) {
       isRotating = rotate;
+  }
+
+  function setRotateDirection(direction) {
+      rotDirection = direction;
+  }
+
+  function setZoomIn(zoom) {
+      isZoomingIn = zoom;
+  }
+
+  function setZoomOut(zoom) {
+      isZoomingOut = zoom;
   }
 
   function initCamera () {
@@ -51161,6 +51176,16 @@ function Viewer (idOrElement) {
         render();
     }
 
+    if(isZoomingIn) {
+        camera.position.z -= zoomDelta;
+        render();
+    }
+
+    if(isZoomingOut) {
+        camera.position.z += zoomDelta;
+        render();
+    }
+
     window.requestAnimationFrame(animate);
   }
 
@@ -51461,6 +51486,10 @@ function Viewer (idOrElement) {
 
   this.isRotating = isRotating;
   this.setRotating = setRotating;
+  this.setRotateDirection = setRotateDirection;
+
+  this.setZoomIn = setZoomIn;
+  this.setZoomOut = setZoomOut;
 
   this.add = add;
   this.remove = remove;
@@ -73979,6 +74008,15 @@ Stage.prototype.setRotation = function setRotation(rotX, rotY, rotZ) {
 
 Stage.prototype.rotateModel = function rotateModel(direction) {
     this.viewer.setRotating(direction === 0 ? false : true);
+    this.viewer.setRotateDirection(direction);
+}
+
+Stage.prototype.zoomInModel = function zoomInModel(zoom) {
+    this.viewer.setZoomIn(zoom);
+}
+
+Stage.prototype.zoomOutModel = function zoomOutModel(zoom) {
+    this.viewer.setZoomOut(zoom);
 }
 /**
  * Set stage parameters

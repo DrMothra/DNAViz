@@ -11,12 +11,12 @@
 
     <script type="text/javascript" src="js/jquery-1.11.2.min.js"></script>
     <script type="text/javascript" src="js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="js/ngl.dev.js?v=0.5"></script>
+    <script type="text/javascript" src="js/ngl.dev.js?v=0.7"></script>
     <script type="text/javascript" src="js/controlKit.js?v=0.2"></script>
     <script type="text/javascript" src="js/moleculeConfig.js?v=0.2"></script>
     <script type="text/javascript" src="js/representationgroup.js"></script>
     <script type="text/javascript" src="js/detector.js"></script>
-    <script type="text/javascript" src="js/pdiview.js?v=0.1"></script>
+    <script type="text/javascript" src="js/pdiview.js?v=0.3"></script>
 </head>
 <body>
     <div id="viewport">
@@ -37,11 +37,18 @@
             </div>
         </div>
 
+        <div id="zoomControls" class="infoPanel text-center">
+            <p>Zoom</p>
+            <div>
+                <button id="zoomIn" type="button" class="btn btn-primary"><img class="img-fluid" src="images/minus.png"></button>
+                <button id="zoomOut" type="button" class="btn btn-primary"><img class="img-fluid" src="images/add.png"></button>
+            </div>
+        </div>
         <div id="rotateControls" class="infoPanel text-center">
             <p>Rotate</p>
             <div>
-                <button id="camLeft" type="button" class="btn btn-primary"><img class="img-fluid" src="images/leftWhite.png"></button>
-                <button id="camRight" type="button" class="btn btn-primary"><img class="img-fluid" src="images/rightWhite.png"></button>
+                <button id="rotateLeft" type="button" class="btn btn-primary"><img class="img-fluid" src="images/leftWhite.png"></button>
+                <button id="rotateRight" type="button" class="btn btn-primary"><img class="img-fluid" src="images/rightWhite.png"></button>
             </div>
         </div>
 

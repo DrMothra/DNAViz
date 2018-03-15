@@ -233,6 +233,14 @@ class DNAViz {
         this.stage.rotateModel(direction);
     }
 
+    zoomIn(zoom) {
+        this.stage.zoomInModel(zoom);
+    }
+
+    zoomOut(zoom) {
+        this.stage.zoomOutModel(zoom);
+    }
+
     createGUI() {
         //Create GUI - controlKit
         window.addEventListener('load', () => {
@@ -446,12 +454,36 @@ $(document).ready(function(e){
         "data/sequence.dat");
     app.createGUI();
 
-    $('#rotateY').on("mousedown", () => {
+    $('#rotateLeft').on("mousedown", () => {
+        app.rotateModel(-1);
+    });
+
+    $('#rotateLeft').on("mouseup", () => {
+        app.rotateModel(0);
+    });
+
+    $('#rotateRight').on("mousedown", () => {
         app.rotateModel(1);
     });
 
-    $('#rotateY').on("mouseup", () => {
+    $('#rotateRight').on("mouseup", () => {
         app.rotateModel(0);
+    });
+
+    $('#zoomIn').on("mousedown", () => {
+        app.zoomIn(true);
+    });
+
+    $('#zoomIn').on("mouseup", () => {
+        app.zoomIn(false);
+    });
+
+    $('#zoomOut').on("mousedown", () => {
+        app.zoomOut(true);
+    });
+
+    $('#zoomOut').on("mouseup", () => {
+        app.zoomOut(false);
     });
 });
 
