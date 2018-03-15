@@ -45,29 +45,35 @@ body {
 .separate div {
     margin-bottom: 2%;
 }
+#guiWidth {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 12.5%;
+}
 #showInfo {
-    top: 5%;
-    left: 3%;
+    top: 1%;
+    left: 2%;
 }
 #toggleContainer {
     right: 1%;
     bottom: 1%;
 }
 #sequenceInfo {
-    top: 1%;
-    right: 10%;
+    bottom: 30%;
+    right: 0%;
     width: 30%;
 }
 #sequenceInfo img {
     width: 100%;
 }
 #toggleSequenceInfo {
-    top: 1%;
-    right: 12.5%;
+    bottom: 30%;
+    right: 1.5%;
 }
 #toggleSequence {
     top: 1%;
-    right: 20%;
+    right: 5%;
 }
 #rotateControls,
 #zoomControls {

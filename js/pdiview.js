@@ -253,9 +253,18 @@ class DNAViz {
             };
 
             let _this = this;
+            let guiWidth = $('#guiWidth').css("width");
+            guiWidth = parseInt(guiWidth, 10);
+            //DEBUG
+            console.log("Gui width = ", guiWidth);
+            if(!guiWidth) {
+                guiWidth = 10;
+            }
+            guiWidth /= 100;
+
             let controlKit = new ControlKit();
 
-            controlKit.addPanel({width: 200})
+            controlKit.addPanel({label: "Configuration", width: window.innerWidth * guiWidth, enable: false})
                 .addSubGroup({label: "Appearance", enable: false})
                     .addColor(appearanceConfig, "Back", {
                         colorMode: "hex", onChange: () => {
