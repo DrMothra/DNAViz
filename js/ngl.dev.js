@@ -81347,7 +81347,8 @@ var HyperballStickImpostorBuffer = (function (BoxBuffer$$1) {
  */
 var HyperballStickBuffer = function HyperballStickBuffer (data, params) {
   if (!ExtensionFragDepth || (params && params.disableImpostor)) {
-    data.radius = calculateMinArray(data.radius1, data.radius2);
+    //data.radius = calculateMinArray(data.radius1, data.radius2);
+    data.radius = data.radius2;
     return new CylinderGeometryBuffer(data, params)
   } else {
     return new HyperballStickImpostorBuffer(data, params)

@@ -79,6 +79,7 @@ body {
 #zoomControls {
     color: white;
     width: 7.5%;
+    -webkit-touch-callout: none;
 }
 #rotateControls {
     right: 2%;

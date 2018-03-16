@@ -264,7 +264,7 @@ class DNAViz {
 
             let controlKit = new ControlKit();
 
-            controlKit.addPanel({label: "Configuration", width: window.innerWidth * guiWidth, enable: false})
+            controlKit.addPanel({label: "Configuration", width: window.innerWidth * guiWidth, enable: true})
                 .addSubGroup({label: "Appearance", enable: false})
                     .addColor(appearanceConfig, "Back", {
                         colorMode: "hex", onChange: () => {
@@ -407,6 +407,14 @@ class DNAViz {
         appearanceConfig[prop] = newValue;
     }
 
+    stopNotifications(elemList) {
+        for(let i=0, numElems=elemList.length; i<numElems; ++i) {
+            $('#' + elemList[i]).contextmenu(() => {
+                return false;
+            });
+        }
+    }
+
     savePreferences(config) {
         for(let prop in config) {
             localStorage.setItem(this.baseName + prop, config[prop]);
@@ -430,6 +438,8 @@ $(document).ready(function(e){
         $("#notSupported").show();
         return;
     }
+
+    $('#mainModal').modal();
 
     $('#hideDetails').on("click", () => {
         $('#graphs').addClass("d-none");
@@ -494,6 +504,9 @@ $(document).ready(function(e){
     $('#zoomOut').on("mouseup", () => {
         app.zoomOut(false);
     });
+
+    let elemList = ["rotateControls", "zoomControls"];
+    app.stopNotifications(elemList);
 });
 
 function safariw(data, target) {
