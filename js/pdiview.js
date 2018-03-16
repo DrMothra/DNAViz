@@ -505,6 +505,38 @@ $(document).ready(function(e){
         app.zoomOut(false);
     });
 
+    $('#rotateLeft').on("touchstart", () => {
+        app.rotateModel(-1);
+    });
+
+    $('#rotateLeft').on("touchend", () => {
+        app.rotateModel(0);
+    });
+
+    $('#rotateRight').on("touchstart", () => {
+        app.rotateModel(1);
+    });
+
+    $('#rotateRight').on("touchend", () => {
+        app.rotateModel(0);
+    });
+
+    $('#zoomIn').on("touchstart", () => {
+        app.zoomIn(true);
+    });
+
+    $('#zoomIn').on("touchend", () => {
+        app.zoomIn(false);
+    });
+
+    $('#zoomOut').on("mousedown", () => {
+        app.zoomOut(true);
+    });
+
+    $('#zoomOut').on("mouseup", () => {
+        app.zoomOut(false);
+    });
+
     let elemList = ["rotateControls", "zoomControls"];
     app.stopNotifications(elemList);
 });
